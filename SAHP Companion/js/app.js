@@ -1497,6 +1497,10 @@
                 setTimeout(() => {
                     splash.classList.add('fade-out');
                     playSound('playDutyChime');
+                    setTimeout(() => {
+                        splash.style.display = 'none';
+                        splash.remove();
+                    }, 400);
                 }, 350);
             }
         }, 300);

@@ -1,6 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-
 /* =====================================================
    1. DESIGN TOKENS & GLOBAL RESETS - SAHP TACTICAL MDT
    ===================================================== */
@@ -124,17 +121,15 @@ body {
 body::before {
     content: '';
     position: fixed;
-    inset: -20px;
-    background-image: url('bg.png');
+    inset: 0;
+    background-image: url('bg-blurred.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    filter: blur(14px) brightness(0.65);
+    opacity: 0.65;
     z-index: 0;
     pointer-events: none;
     transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
 }
 
 .bg-blur {
@@ -215,7 +210,7 @@ body::before {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
     object-fit: contain;
 }
 
@@ -478,7 +473,9 @@ body::before {
     transform: translateZ(0);
     will-change: transform;
     contain: layout paint;
-    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 170px;
+    transition: transform 0.15s ease, border-color 0.15s ease;
     overflow: hidden;
 }
 
@@ -503,34 +500,32 @@ body::before {
     box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7), 0 0 22px rgba(245, 158, 11, 0.25);
 }
 
-/* Subtle corner ambient glows */
+/* Zero-cost radial corner glows without runtime blur filters */
 .card-glow {
     position: absolute;
     top: 0;
     right: 0;
-    width: 130px;
-    height: 130px;
+    width: 140px;
+    height: 140px;
     pointer-events: none;
-    border-radius: 50%;
-    filter: blur(35px);
-    opacity: 0.18;
-    transition: opacity 0.2s ease;
-    transform: translateZ(0);
+    border-radius: 0 18px 0 0;
+    opacity: 0.4;
+    transition: opacity 0.15s ease;
 }
 
 .tactical-card:hover .card-glow {
-    opacity: 0.35;
+    opacity: 0.75;
 }
 
-.glow-rose { background: #f43f5e; }
-.glow-blue { background: #38bdf8; }
-.glow-cyan { background: #06b6d4; }
-.glow-gold { background: #f59e0b; }
-.glow-emerald { background: #10b981; }
-.glow-purple { background: #a855f7; }
-.glow-amber { background: #f59e0b; }
-.glow-teal { background: #14b8a6; }
-.glow-slate { background: #94a3b8; }
+.glow-rose { background: radial-gradient(circle at top right, rgba(244, 63, 94, 0.4) 0%, transparent 70%); }
+.glow-blue { background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.4) 0%, transparent 70%); }
+.glow-cyan { background: radial-gradient(circle at top right, rgba(6, 182, 212, 0.4) 0%, transparent 70%); }
+.glow-gold { background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.4) 0%, transparent 70%); }
+.glow-emerald { background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.4) 0%, transparent 70%); }
+.glow-purple { background: radial-gradient(circle at top right, rgba(168, 85, 247, 0.4) 0%, transparent 70%); }
+.glow-amber { background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.4) 0%, transparent 70%); }
+.glow-teal { background: radial-gradient(circle at top right, rgba(20, 184, 166, 0.4) 0%, transparent 70%); }
+.glow-slate { background: radial-gradient(circle at top right, rgba(148, 163, 184, 0.4) 0%, transparent 70%); }
 
 /* Card Header Bar & Badges */
 .card-header-bar {
@@ -765,7 +760,7 @@ body::before {
     height: 28px;
     border-radius: 50%;
     object-fit: contain;
-    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5));
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
 }
 
 .dock-badge {
@@ -1264,9 +1259,9 @@ body::before {
 }
 
 @keyframes pulseGlow {
-    0% { transform: scale(0.9); opacity: 0.6; }
-    50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
-    100% { transform: scale(0.9); opacity: 0.6; }
+    0% { transform: scale(0.88); opacity: 0.5; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(0.88); opacity: 0.5; }
 }
 
 /* Tabs System */
@@ -1569,8 +1564,10 @@ input:checked + .slider:before {
     align-items: center;
     gap: 0.6rem;
     font-size: 0.82rem;
-    transition: background 0.15s ease;
+    transition: background 0.12s ease;
     cursor: pointer;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 44px;
 }
 .penal-row:last-child {
     border-bottom: none;
@@ -2156,8 +2153,10 @@ input:checked + .slider:before {
     align-items: center;
     gap: 0.6rem;
     font-size: 0.82rem;
-    transition: background 0.15s ease;
+    transition: background 0.12s ease;
     cursor: pointer;
+    content-visibility: auto;
+    contain-intrinsic-size: 0 44px;
 }
 .traffic-row:last-child {
     border-bottom: none;
@@ -2460,4 +2459,77 @@ input:checked + .slider:before {
     .tactical-dock {
         bottom: 8px;
     }
+}
+
+/* =====================================================
+   AI SPLASH SCREEN & BOOT OVERLAY
+   ===================================================== */
+#ai-splash-screen {
+    position: fixed;
+    inset: 0;
+    background-color: #030712;
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #38bdf8;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+    transition: opacity 0.35s ease-out, visibility 0.35s ease-out;
+}
+
+#ai-splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.splash-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 90%;
+    max-width: 480px;
+    text-align: center;
+}
+
+.status-header {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    color: #ffffff;
+}
+
+.status-text {
+    font-size: 0.8rem;
+    color: var(--secondary);
+    letter-spacing: 0.8px;
+}
+
+.status-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.status-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #ef4444);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.status-logs {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 48px;
 }
