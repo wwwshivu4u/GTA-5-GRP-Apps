@@ -55,14 +55,22 @@
 
             <!-- Department Branding & Duty Indicator -->
             <div class="topbar-branding">
-                <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini">
-                <div class="topbar-titles">
-                    <span class="topbar-org">SAN ANDREAS HIGHWAY PATROL</span>
-                    <span class="topbar-sub">CAD &bull; MDT PATROL COMPANION</span>
-                </div>
-                <div class="topbar-duty-pill off-duty" id="topbar-duty-status-pill" onclick="window.app.toggleDutyStatus()" title="Click to toggle Duty Status">
-                    <span class="pulse-dot"></span> <span id="topbar-duty-status-text">OFF DUTY</span>
-                </div>
+                <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini" title="San Andreas Highway Patrol">
+                <button class="topbar-duty-icon-btn off-duty" id="topbar-duty-btn" onclick="window.app.toggleDutyStatus()" title="Toggle Duty Status (Copy 10-8 / 10-9)" aria-label="Toggle Duty Status">
+                    <span class="material-symbols-outlined" id="topbar-duty-icon">power_settings_new</span>
+                </button>
+                <select id="topbar-job-type" class="topbar-job-select" onchange="window.app.setJobType(this.value)" title="Active Duty Assignment">
+                    <option value="" disabled selected>Select Duty...</option>
+                    <option value="Highway Patrol">Highway Patrol</option>
+                    <option value="City Patrol">City Patrol</option>
+                    <option value="Traffic Enforcement">Traffic Enforcement</option>
+                    <option value="Speed Radar Enforcement">Speed Radar Enforcement</option>
+                    <option value="Detective Bureau">Detective Bureau</option>
+                    <option value="Air Support">Air Support</option>
+                    <option value="DOC Transport">DOC Transport</option>
+                    <option value="HQ Front Desk">HQ Front Desk</option>
+                    <option value="Training / HR">Training / HR</option>
+                </select>
                 <div class="topbar-officer-pill" id="topbar-officer-pill" onclick="openModal('modal-settings')" title="Click to edit Officer Profile">
                     <span class="material-symbols-outlined" style="font-size:0.95rem; color:var(--gold);">badge</span>
                     <span id="topbar-officer-name">TROOPER [UNASSIGNED]</span>
@@ -175,96 +183,24 @@
                         <span class="material-symbols-outlined icon-gradient-blue">podcasts</span>
                     </div>
                     <h3 class="card-title">COMMS &amp; 10-CODES</h3>
-                    <p class="card-desc">Tactical 10-codes, inter-department comms (/d), panic panic callouts and status transmissions.</p>
+                    <p class="card-desc">Tactical 10-codes, inter-department comms (/d), status codes and department radio transmissions.</p>
                     <div class="card-footer-action">
                         <span>Open Comms</span>
                         <span class="material-symbols-outlined action-arrow">arrow_forward</span>
                     </div>
                 </div>
 
-                <!-- 3: Penal Code Engine -->
-                <div class="tactical-card highlight-card" onclick="openModal('modal-penal')">
-                    <div class="card-glow glow-gold"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-gold">CALCULATOR</span>
-                        <span class="card-tag">PEN-03</span>
-                    </div>
-                    <div class="card-icon-wrap icon-gold">
-                        <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
-                    </div>
-                    <h3 class="card-title">PENAL CODE ENGINE</h3>
-                    <p class="card-desc">Search 135+ offenses with instant fine sums, prison sentence totals, bail clearance &amp; PDA formatting.</p>
-                    <div class="card-footer-action">
-                        <span>Launch Engine</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 4: Arrest & 25-Min Custody -->
-                <div class="tactical-card" onclick="openModal('modal-arrest')">
-                    <div class="card-glow glow-emerald"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-emerald">DETENTION</span>
-                        <span class="card-tag">ARR-04</span>
-                    </div>
-                    <div class="card-icon-wrap icon-emerald">
-                        <span class="material-symbols-outlined icon-gradient-emerald">lock_clock</span>
-                    </div>
-                    <h3 class="card-title">ARREST &amp; 25-MIN TIMER</h3>
-                    <p class="card-desc">25-minute detention countdown, Miranda warning, lawyer pause locks, sub-timers &amp; booking RP.</p>
-                    <div class="card-footer-action">
-                        <span>Open Custody</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 5: Traffic Codes & Impound -->
-                <div class="tactical-card highlight-card" onclick="openModal('modal-traffic')">
-                    <div class="card-glow glow-cyan"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-cyan">ENGINE</span>
-                        <span class="card-tag">TRF-05</span>
-                    </div>
-                    <div class="card-icon-wrap icon-cyan">
-                        <span class="material-symbols-outlined icon-gradient-cyan">speed</span>
-                    </div>
-                    <h3 class="card-title">TRAFFIC CODES ENGINE</h3>
-                    <p class="card-desc">Interactive traffic offenses, live fine &amp; prison calculators, tow matrix, speed limits &amp; PDA formatting.</p>
-                    <div class="card-footer-action">
-                        <span>Launch Engine</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 6: Dress Codes & Rank Uniforms -->
-                <div class="tactical-card" onclick="openModal('modal-dresscodes')">
-                    <div class="card-glow glow-amber"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-amber">INSPECTION</span>
-                        <span class="card-tag">UNI-06</span>
-                    </div>
-                    <div class="card-icon-wrap icon-amber">
-                        <span class="material-symbols-outlined icon-gradient-amber">apparel</span>
-                    </div>
-                    <h3 class="card-title">DRESS CODES &amp; RANKS</h3>
-                    <p class="card-desc">Uniform guidelines for Cadets, Patrol, Detectives, SWAT tactical loadouts &amp; High Command dress.</p>
-                    <div class="card-footer-action">
-                        <span>View Uniforms</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 7: RP & HR Commands -->
+                <!-- 3: Roleplay & HR Commands -->
                 <div class="tactical-card" onclick="openModal('modal-roleplay')">
                     <div class="card-glow glow-purple"></div>
                     <div class="card-header-bar">
                         <span class="card-badge badge-purple">ROLEPLAY</span>
-                        <span class="card-tag">CMD-07</span>
+                        <span class="card-tag">CMD-03</span>
                     </div>
                     <div class="card-icon-wrap icon-purple">
                         <span class="material-symbols-outlined icon-gradient-purple">psychology</span>
                     </div>
-                    <h3 class="card-title">RP &amp; HR COMMANDS</h3>
+                    <h3 class="card-title">ROLEPLAY</h3>
                     <p class="card-desc">Complete /me, /do, /try, /todo emotes, weapon checks, breathalyzers, search &amp; frisk RP actions.</p>
                     <div class="card-footer-action">
                         <span>View Commands</span>
@@ -272,92 +208,38 @@
                     </div>
                 </div>
 
-                <!-- 8: Article 7 Parking Map -->
-                <div class="tactical-card" onclick="openModal('modal-article7')">
-                    <div class="card-glow glow-teal"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-teal">TOWING</span>
-                        <span class="card-tag">PRK-08</span>
-                    </div>
-                    <div class="card-icon-wrap icon-teal">
-                        <span class="material-symbols-outlined icon-gradient-emerald">local_parking</span>
-                    </div>
-                    <h3 class="card-title">ARTICLE 7 PARKING</h3>
-                    <p class="card-desc">Downtown red-zone curbs, Mission Row tow boundaries, valid impound proof requirements &amp; maps.</p>
-                    <div class="card-footer-action">
-                        <span>View Parking</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 9: §2.4 Prohibited Items -->
-                <div class="tactical-card" onclick="openModal('modal-prohibited')">
-                    <div class="card-glow glow-rose"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-rose">CONTRABAND</span>
-                        <span class="card-tag">SEC-09</span>
-                    </div>
-                    <div class="card-icon-wrap icon-rose">
-                        <span class="material-symbols-outlined icon-gradient-rose">block</span>
-                    </div>
-                    <h3 class="card-title">PROHIBITED ITEMS (§2.4)</h3>
-                    <p class="card-desc">Class 1 &amp; Class 2 weapon restrictions, illegal narcotics threshold, body armor &amp; confiscation logs.</p>
-                    <div class="card-footer-action">
-                        <span>Inspect Items</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 10: Quick Officer Notepad -->
-                <div class="tactical-card" onclick="openModal('modal-notes')">
-                    <div class="card-glow glow-amber"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-amber">AUTO-SAVE</span>
-                        <span class="card-tag">NOT-10</span>
-                    </div>
-                    <div class="card-icon-wrap icon-amber">
-                        <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
-                    </div>
-                    <h3 class="card-title">FIELD NOTEPAD</h3>
-                    <p class="card-desc">Real-time persistent field scratchpad for license plates, suspect IDs, dispatch notes &amp; arrest drafts.</p>
-                    <div class="card-footer-action">
-                        <span>Open Notepad</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 11: MDT Settings & Config -->
-                <div class="tactical-card" onclick="openModal('modal-settings')">
-                    <div class="card-glow glow-slate"></div>
-                    <div class="card-header-bar">
-                        <span class="card-badge badge-slate">CONFIG</span>
-                        <span class="card-tag">CFG-11</span>
-                    </div>
-                    <div class="card-icon-wrap icon-slate">
-                        <span class="material-symbols-outlined icon-gradient-slate">tune</span>
-                    </div>
-                    <h3 class="card-title">SETTINGS &amp; PROFILES</h3>
-                    <p class="card-desc">Officer callsign &amp; badge, skip boot screen toggle, Discord routing channels, backup &amp; baselines.</p>
-                    <div class="card-footer-action">
-                        <span>Open Settings</span>
-                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
-                    </div>
-                </div>
-
-                <!-- 12: About SAHP / Manual -->
-                <div class="tactical-card" onclick="openAboutTeam()">
+                <!-- 4: Combined Penal Codes & Traffic Codes Engine -->
+                <div class="tactical-card highlight-card" onclick="openModal('modal-penal')">
                     <div class="card-glow glow-gold"></div>
                     <div class="card-header-bar">
-                        <span class="card-badge badge-gold">DEPARTMENT</span>
-                        <span class="card-tag">MAN-12</span>
+                        <span class="card-badge badge-gold">ENGINE &amp; CITATIONS</span>
+                        <span class="card-tag">LEG-04</span>
                     </div>
                     <div class="card-icon-wrap icon-gold">
-                        <span class="material-symbols-outlined icon-gradient-gold">local_police</span>
+                        <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
                     </div>
-                    <h3 class="card-title">ABOUT SAHP COMMAND</h3>
-                    <p class="card-desc">Official EN3 Highway Patrol guidelines, state jurisdiction values, chain of command &amp; reference manual.</p>
+                    <h3 class="card-title">PENAL &amp; TRAFFIC CODES</h3>
+                    <p class="card-desc">Combined EN3 legal engine: 135+ offenses, fine &amp; prison sums, bail check, speed radar &amp; impound calculator.</p>
                     <div class="card-footer-action">
-                        <span>Department Info</span>
+                        <span>Launch Engine</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 5: More Tools & Services -->
+                <div class="tactical-card" onclick="openModal('modal-more')">
+                    <div class="card-glow glow-emerald"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-emerald">DEPARTMENT</span>
+                        <span class="card-tag">MOR-05</span>
+                    </div>
+                    <div class="card-icon-wrap icon-emerald">
+                        <span class="material-symbols-outlined icon-gradient-emerald">grid_view</span>
+                    </div>
+                    <h3 class="card-title">MORE</h3>
+                    <p class="card-desc">Arrest timer, dress codes, Article 7 parking, prohibited items (§2.4), field notepad, settings &amp; manual.</p>
+                    <div class="card-footer-action">
+                        <span>Open More Tools</span>
                         <span class="material-symbols-outlined action-arrow">arrow_forward</span>
                     </div>
                 </div>
@@ -600,7 +482,7 @@
                         <button class="quick-code-btn" onclick="copySimple('10-17 enroute to DOC with 10-15')">
                             <span>10-17</span><span class="code-sub">DOC Convoy</span>
                         </button>
-                        <button class="quick-code-btn" onclick="copySimple('10-19 returning to Mission Row HQ')">
+                        <button class="quick-code-btn" onclick="copySimple('10-19 returning to Paleto Bay HQ')">
                             <span>10-19</span><span class="code-sub">Return to HQ</span>
                         </button>
                         <button class="quick-code-btn" onclick="copySimple('10-20 What is your current location?')">
@@ -618,20 +500,23 @@
                         <button class="quick-code-btn btn-qc-warn" onclick="copySimple('10-80 Foxtrot Foot pursuit in progress at [LOC]!')">
                             <span>10-80F</span><span class="code-sub">Foot Pursuit</span>
                         </button>
-                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('10-99 situation concluded / booking complete')">
-                            <span>10-99</span><span class="code-sub">Concluded / Done</span>
+                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('10-99 Situation concluded')">
+                            <span>10-99</span><span class="code-sub">Concluded</span>
                         </button>
-                        <button class="quick-code-btn btn-qc-warn" onclick="copySimple('Code 2, responding lights only')">
+                        <button class="quick-code-btn btn-qc-panic" onclick="copySimple('Code 1 – Life-Threatening Emergency')">
+                            <span>Code 1</span><span class="code-sub">Emergency</span>
+                        </button>
+                        <button class="quick-code-btn btn-qc-warn" onclick="copySimple('Code 2 – Semi-Emergency (Lights Only)')">
                             <span>Code 2</span><span class="code-sub">Semi-Emergency</span>
                         </button>
-                        <button class="quick-code-btn btn-qc-emergency" onclick="copySimple('Code 3, responding lights and sirens!')">
-                            <span>Code 3</span><span class="code-sub">Emergency</span>
+                        <button class="quick-code-btn btn-qc-emergency" onclick="copySimple('Code 3 – Emergency (Lights & Siren)')">
+                            <span>Code 3</span><span class="code-sub">Lights &amp; Siren</span>
                         </button>
-                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('Code 4, situation under control')">
-                            <span>Code 4</span><span class="code-sub">All Clear</span>
+                        <button class="quick-code-btn btn-qc-clear" onclick="copySimple('Code 4 – Situation Under Control')">
+                            <span>Code 4</span><span class="code-sub">Under Control</span>
                         </button>
-                        <button class="quick-code-btn btn-qc-panic" onclick="copySimple('11-99 OFFICER IN DISTRESS! ALL UNITS RESPOND!')">
-                            <span>11-99</span><span class="code-sub">PANIC ALARM</span>
+                        <button class="quick-code-btn btn-qc-panic" onclick="copySimple('Code 5 – Terrorist Attack')">
+                            <span>Code 5</span><span class="code-sub">Terrorist Attack</span>
                         </button>
                     </div>
 
@@ -641,41 +526,41 @@
                     <!-- TAB 1: COMPLETE 10-CODES DIRECTORY -->
                     <div class="tab-content active" id="tab-rc-10codes">
                         <div class="glass-section" style="padding:0.4rem 0;">
-                            <div class="rc-table-row"><span class="rc-code-badge">10-1</span><span class="rc-code-desc">Roll call / Announcement — all units return to headquarters</span><button class="btn copy-btn" onclick="copySimple('10-1 all units return to headquarters')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-1</span><span class="rc-code-desc">Roll call/Announcement—all units return to headquarters</span><button class="btn copy-btn" onclick="copySimple('10-1 Roll call/Announcement—all units return to headquarters')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
                             <div class="rc-table-row"><span class="rc-code-badge">10-2</span><span class="rc-code-desc">Negative</span><button class="btn copy-btn" onclick="copySimple('10-2')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-3</span><span class="rc-code-desc">Stop Transmitting</span><button class="btn copy-btn" onclick="copySimple('10-3 clear the radio channel')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-4</span><span class="rc-code-desc">Acknowledged / Affirmative</span><button class="btn copy-btn" onclick="copySimple('10-4')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-5</span><span class="rc-code-desc">Repeat Last Transmission</span><button class="btn copy-btn" onclick="copySimple('10-5 repeat last transmission')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-6</span><span class="rc-code-desc">Disregard the Last Transmission</span><button class="btn copy-btn" onclick="copySimple('10-6 disregard last transmission')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-7</span><span class="rc-code-desc">Break at Headquarters (AFK)</span><button class="btn copy-btn" onclick="copySimple('10-7 Break at headquarters')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-8</span><span class="rc-code-desc">In-service / Available</span><button class="btn copy-btn" onclick="copySimple('10-8 available and in-service')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-9</span><span class="rc-code-desc">Out of Service / Unavailable</span><button class="btn copy-btn" onclick="copySimple('10-9 out of service')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-3</span><span class="rc-code-desc">Stop Transmitting</span><button class="btn copy-btn" onclick="copySimple('10-3 Stop Transmitting')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-4</span><span class="rc-code-desc">Acknowledged/Affirmative</span><button class="btn copy-btn" onclick="copySimple('10-4')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-5</span><span class="rc-code-desc">Repeat Last Transmission</span><button class="btn copy-btn" onclick="copySimple('10-5 Repeat Last Transmission')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-6</span><span class="rc-code-desc">Disregard the Last Transmission</span><button class="btn copy-btn" onclick="copySimple('10-6 Disregard the Last Transmission')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-7</span><span class="rc-code-desc">Break at Headquarters (AFK)</span><button class="btn copy-btn" onclick="copySimple('10-7 Break at Headquarters (AFK)')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-8</span><span class="rc-code-desc">In-service/Available</span><button class="btn copy-btn" onclick="copySimple('10-8 In-service/Available')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-9</span><span class="rc-code-desc">Out of Service/Unavailable</span><button class="btn copy-btn" onclick="copySimple('10-9 Out of Service/Unavailable')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
                             <div class="rc-table-row"><span class="rc-code-badge">10-10</span><span class="rc-code-desc">Shots Fired</span><button class="btn copy-btn" onclick="copySimple('10-10 Shots Fired at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
                             <div class="rc-table-row"><span class="rc-code-badge">TANGO 10-10</span><span class="rc-code-desc">Training Shots Fired</span><button class="btn copy-btn" onclick="copySimple('TANGO 10-10 Training Shots Fired at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-11</span><span class="rc-code-desc">Robbery in Progress</span><button class="btn copy-btn" onclick="copySimple('10-11 Robbery in progress at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-12</span><span class="rc-code-desc">Estimated Time of Arrival (ETA)</span><button class="btn copy-btn" onclick="copySimple('10-12 ETA is 2 minutes')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge" style="color:#ef4444;">10-13</span><span class="rc-code-desc">Agent / Government Employee Down (Top Priority)</span><button class="btn copy-btn" onclick="copySimple('10-13 OFFICER DOWN AT {LOC}! ALL UNITS RESPOND!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-15</span><span class="rc-code-desc">Suspect in Custody</span><button class="btn copy-btn" onclick="copySimple('10-15 suspect secured at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-16</span><span class="rc-code-desc">Injured Civilian</span><button class="btn copy-btn" onclick="copySimple('10-16 injured civilian at {LOC}, requesting EMS')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-17</span><span class="rc-code-desc">En route</span><button class="btn copy-btn" onclick="copySimple('10-17 enroute to DOC with 10-15 and convoy')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-19</span><span class="rc-code-desc">Return to Headquarters</span><button class="btn copy-btn" onclick="copySimple('10-19 returning to Mission Row HQ')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-20</span><span class="rc-code-desc">Location Check</span><button class="btn copy-btn" onclick="copySimple('10-20 what is your current location?')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-21</span><span class="rc-code-desc">Status Check (Specify current status &amp; location)</span><button class="btn copy-btn" onclick="copySimple('10-21 status check on all active units')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-11</span><span class="rc-code-desc">Robbery in Progress</span><button class="btn copy-btn" onclick="copySimple('10-11 Robbery in Progress at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-12</span><span class="rc-code-desc">Estimated Time of Arrival</span><button class="btn copy-btn" onclick="copySimple('10-12 ETA is 2 minutes')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge" style="color:#ef4444;">10-13</span><span class="rc-code-desc">Agent/Government Employee Down (Top Priority)</span><button class="btn copy-btn" onclick="copySimple('10-13 AGENT/GOVERNMENT EMPLOYEE DOWN AT {LOC}! ALL UNITS RESPOND!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-15</span><span class="rc-code-desc">Suspect in Custody</span><button class="btn copy-btn" onclick="copySimple('10-15 Suspect in Custody at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-16</span><span class="rc-code-desc">Injured Civilian</span><button class="btn copy-btn" onclick="copySimple('10-16 Injured Civilian at {LOC}, requesting EMS')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-17</span><span class="rc-code-desc">En route</span><button class="btn copy-btn" onclick="copySimple('10-17 En route to DOC with 10-15 and convoy')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-19</span><span class="rc-code-desc">Return to the Headquarters</span><button class="btn copy-btn" onclick="copySimple('10-19 Return to the Headquarters (Paleto Bay HQ)')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-20</span><span class="rc-code-desc">Location</span><button class="btn copy-btn" onclick="copySimple('10-20 Location check')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-21</span><span class="rc-code-desc">Status Check (Specify your current status and location)</span><button class="btn copy-btn" onclick="copySimple('10-21 Status Check on all active units')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
                             <div class="rc-table-row"><span class="rc-code-badge">10-22</span><span class="rc-code-desc">Hostage Situation</span><button class="btn copy-btn" onclick="copySimple('10-22 Hostage Situation at {LOC}! Hold fire!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-23</span><span class="rc-code-desc">Arrived at Scene</span><button class="btn copy-btn" onclick="copySimple('10-23 arrived on scene at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-32</span><span class="rc-code-desc">Backup Needed (Specify units and location)</span><button class="btn copy-btn" onclick="copySimple('10-32 Need backup at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-35</span><span class="rc-code-desc">Ambulance Needs Assistance</span><button class="btn copy-btn" onclick="copySimple('10-35 Ambulance requesting police escort at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-41</span><span class="rc-code-desc">Start of Watch</span><button class="btn copy-btn" onclick="copySimple('10-41 start of watch')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-42</span><span class="rc-code-desc">End of Watch</span><button class="btn copy-btn" onclick="copySimple('10-42 end of watch')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-51</span><span class="rc-code-desc">Vehicle Traffic Stop</span><button class="btn copy-btn" onclick="copySimple('10-51 conducting traffic stop at {LOC} on vehicle [PLATE]')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-52</span><span class="rc-code-desc">Felony Traffic Stop</span><button class="btn copy-btn" onclick="copySimple('10-52 Felony traffic stop at {LOC}! Requesting code 3 backup!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-70</span><span class="rc-code-desc">Suspect has Warrants</span><button class="btn copy-btn" onclick="copySimple('10-70 suspect has active felony warrants')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-75</span><span class="rc-code-desc">Vehicle Wanted / Stolen</span><button class="btn copy-btn" onclick="copySimple('10-75 stolen vehicle spotted at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-80</span><span class="rc-code-desc">Vehicle Pursuit</span><button class="btn copy-btn" onclick="copySimple('10-80 Vehicle pursuit initiated on [VEHICLE] heading [DIR]!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-80 Foxtrot</span><span class="rc-code-desc">Foot Pursuit</span><button class="btn copy-btn" onclick="copySimple('10-80 Foxtrot Foot pursuit at {LOC}! Suspect fleeing on foot!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-90</span><span class="rc-code-desc">Crime in Progress</span><button class="btn copy-btn" onclick="copySimple('10-90 crime in progress at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-92</span><span class="rc-code-desc">Armed Robbery in Progress</span><button class="btn copy-btn" onclick="copySimple('10-92 Armed Robbery in progress at {LOC}! Suspects armed!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
-                            <div class="rc-table-row"><span class="rc-code-badge">10-99</span><span class="rc-code-desc">Situation Concluded</span><button class="btn copy-btn" onclick="copySimple('10-99 situation concluded, scene is code 4')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-23</span><span class="rc-code-desc">Arrived at Scene</span><button class="btn copy-btn" onclick="copySimple('10-23 Arrived at Scene: {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-32</span><span class="rc-code-desc">Backup Needed (Specify the number of units and location)</span><button class="btn copy-btn" onclick="copySimple('10-32 Backup Needed at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-35</span><span class="rc-code-desc">Ambulance Needs Assistance</span><button class="btn copy-btn" onclick="copySimple('10-35 Ambulance Needs Assistance at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-41</span><span class="rc-code-desc">Start of Watch</span><button class="btn copy-btn" onclick="copySimple('10-41 Start of Watch')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-42</span><span class="rc-code-desc">End of Watch</span><button class="btn copy-btn" onclick="copySimple('10-42 End of Watch')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-51</span><span class="rc-code-desc">Vehicle Traffic Stop</span><button class="btn copy-btn" onclick="copySimple('10-51 Vehicle Traffic Stop at {LOC} on vehicle [PLATE]')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-52</span><span class="rc-code-desc">Felony Traffic Stop</span><button class="btn copy-btn" onclick="copySimple('10-52 Felony Traffic Stop at {LOC}! Requesting code 3 backup!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-70</span><span class="rc-code-desc">Suspect has Warrants</span><button class="btn copy-btn" onclick="copySimple('10-70 Suspect has Warrants')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-75</span><span class="rc-code-desc">Vehicle Wanted/Stolen</span><button class="btn copy-btn" onclick="copySimple('10-75 Vehicle Wanted/Stolen at {LOC}')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-80</span><span class="rc-code-desc">Vehicle Pursuit</span><button class="btn copy-btn" onclick="copySimple('10-80 Vehicle Pursuit initiated on [VEHICLE] heading [DIR]!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-80 Foxtrot</span><span class="rc-code-desc">Foot Pursuit</span><button class="btn copy-btn" onclick="copySimple('10-80 Foxtrot: Foot Pursuit at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-90</span><span class="rc-code-desc">Crime in Progress</span><button class="btn copy-btn" onclick="copySimple('10-90 Crime in Progress at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-92</span><span class="rc-code-desc">Armed Robbery in Progress</span><button class="btn copy-btn" onclick="copySimple('10-92 Armed Robbery in Progress at {LOC}!')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
+                            <div class="rc-table-row"><span class="rc-code-badge">10-99</span><span class="rc-code-desc">Situation concluded</span><button class="btn copy-btn" onclick="copySimple('10-99 Situation concluded')"><span class="material-symbols-outlined" style="font-size:0.9rem;">content_copy</span></button></div>
                         </div>
                     </div>
 
@@ -683,49 +568,49 @@
                     <div class="tab-content" id="tab-rc-status" style="display:none;">
                         <div class="copy-blocks-grid">
                             <div class="copy-block">
-                                <div class="copy-header"><span>Code A — Game Crash</span><button class="btn copy-btn" onclick="copySimple('Code A, flying back immediately')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
-                                <div class="copy-content">Code A — (( Game crash ))</div>
+                                <div class="copy-header"><span>Code A – Game Crash</span><button class="btn copy-btn" onclick="copySimple('Code A – Game Crash')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Code A – Game Crash</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Code B — Paused RP</span><button class="btn copy-btn" onclick="copySimple('Code B, situation paused for admin')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
-                                <div class="copy-content">Code B — (( Paused RP, admin situation ))</div>
+                                <div class="copy-header"><span>Code B – Paused RP, Admin Situation</span><button class="btn copy-btn" onclick="copySimple('Code B – Paused RP, Admin Situation')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Code B – Paused RP, Admin Situation</div>
                             </div>
                             <div class="copy-block" style="border-color:rgba(239,68,68,0.4);">
                                 <div class="copy-header" style="background:rgba(239,68,68,0.1);">
-                                    <span style="color:#f87171;">Code 1 — Life-Threatening Emergency</span>
-                                    <button class="btn copy-btn" onclick="copySimple('Code 1, responding ASAP lights and sirens!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                    <span style="color:#f87171;">Code 1 – Life-Threatening Emergency</span>
+                                    <button class="btn copy-btn" onclick="copySimple('Code 1 – Life-Threatening Emergency')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                 </div>
-                                <div class="copy-content" style="color:#f87171;">Drop what you are doing and respond immediately (Lights &amp; Sirens)</div>
+                                <div class="copy-content" style="color:#f87171;">Life-Threatening Emergency. Drop what you are doing and respond ASAP (Lights &amp; Siren)</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Code 2 — Semi-Emergency</span><button class="btn copy-btn" onclick="copySimple('Code 2, responding lights only')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
-                                <div class="copy-content">Semi-emergency (Lights only, no siren)</div>
+                                <div class="copy-header"><span>Code 2 – Semi-Emergency</span><button class="btn copy-btn" onclick="copySimple('Code 2 – Semi-Emergency')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Semi-Emergency (Lights Only)</div>
                             </div>
                             <div class="copy-block" style="border-color:rgba(56,189,248,0.4);">
                                 <div class="copy-header" style="background:rgba(56,189,248,0.1);">
-                                    <span style="color:#38bdf8;">Code 3 — Emergency</span>
-                                    <button class="btn copy-btn" onclick="copySimple('Code 3, responding lights and sirens!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                    <span style="color:#38bdf8;">Code 3 – Emergency</span>
+                                    <button class="btn copy-btn" onclick="copySimple('Code 3 – Emergency')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                 </div>
-                                <div class="copy-content" style="color:#38bdf8;">Emergency response (Lights &amp; Sirens active)</div>
+                                <div class="copy-content" style="color:#38bdf8;">Emergency (Lights &amp; Siren)</div>
                             </div>
                             <div class="copy-block" style="border-color:rgba(16,185,129,0.4);">
                                 <div class="copy-header" style="background:rgba(16,185,129,0.1);">
-                                    <span style="color:#34d399;">Code 4 — Situation Under Control</span>
-                                    <button class="btn copy-btn" onclick="copySimple('Code 4, situation under control, scene clear')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
+                                    <span style="color:#34d399;">Code 4 – Situation Under Control</span>
+                                    <button class="btn copy-btn" onclick="copySimple('Code 4 – Situation Under Control')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button>
                                 </div>
-                                <div class="copy-content" style="color:#34d399;">Situation under control / All clear. Further units cancel response.</div>
+                                <div class="copy-content" style="color:#34d399;">Situation Under Control</div>
                             </div>
                             <div class="copy-block" style="border-color:rgba(239,68,68,0.5);">
-                                <div class="copy-header" style="background:rgba(239,68,68,0.15);"><span style="color:#ef4444; font-weight:700;">Code 5 — Terrorist Attack</span><button class="btn copy-btn" onclick="copySimple('Code 5! Terrorist attack at [LOC]! All state agencies respond!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
-                                <div class="copy-content" style="color:#ef4444;">Terrorist attack declared. Full tactical mobilization.</div>
+                                <div class="copy-header" style="background:rgba(239,68,68,0.15);"><span style="color:#ef4444; font-weight:700;">Code 5 – Terrorist Attack</span><button class="btn copy-btn" onclick="copySimple('Code 5 – Terrorist Attack')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content" style="color:#ef4444;">Terrorist Attack</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Code 6 — Out of Vehicle</span><button class="btn copy-btn" onclick="copySimple('Code 6 at [LOC]')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
-                                <div class="copy-content">Officer is on foot / out of patrol cruiser conducting activities.</div>
+                                <div class="copy-header"><span>Code 6 – Out of Vehicle</span><button class="btn copy-btn" onclick="copySimple('Code 6 – Out of Vehicle')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Out of Vehicle</div>
                             </div>
                             <div class="copy-block">
-                                <div class="copy-header"><span>Code 7 — Conducting an Investigation</span><button class="btn copy-btn" onclick="copySimple('Code 7 conducting investigation at [LOC]')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
-                                <div class="copy-content">Conducting an active investigation / scene processing.</div>
+                                <div class="copy-header"><span>Code 7 – Conducting an Investigation</span><button class="btn copy-btn" onclick="copySimple('Code 7 – Conducting an Investigation')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div>
+                                <div class="copy-content">Conducting an Investigation</div>
                             </div>
                         </div>
                     </div>
@@ -825,7 +710,7 @@
                                 <div class="copy-block"><div class="copy-header"><span>Store Robbery</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Store Robbery in progress at [LOC]! Units respond Code 3!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Store Robbery in progress at [LOC]! Units respond Code 3!</div></div>
                                 <div class="copy-block"><div class="copy-header"><span>Gun Store Robbery</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Gun Store Robbery in progress at [LOC]! High alert, suspect armed!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Gun Store Robbery in progress at [LOC]! High alert, suspect armed!</div></div>
                                 <div class="copy-block"><div class="copy-header"><span>Hostage Situation</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: Hostage Situation at [LOC]! Set up outer perimeter, negotiator enroute!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: Hostage Situation at [LOC]! Set up outer perimeter, negotiator enroute!</div></div>
-                                <div class="copy-block"><div class="copy-header"><span>Officer Needs Help (11-99)</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: 11-99! Trooper in distress at [LOC]! ALL AVAILABLE UNITS RESPOND CODE 3!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content">SAHP To ALL: 11-99! Trooper in distress at [LOC]! ALL AVAILABLE UNITS RESPOND CODE 3!</div></div>
+                                <div class="copy-block" style="border-color:rgba(239,68,68,0.5);"><div class="copy-header" style="background:rgba(239,68,68,0.15);"><span style="color:#ef4444; font-weight:700;">Agent Down (10-13)</span><button class="btn copy-btn" onclick="copySimple('SAHP To ALL: 10-13! Agent Down at [LOC]! ALL AVAILABLE UNITS RESPOND CODE 3!')"><span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span></button></div><div class="copy-content" style="color:#f87171;">SAHP To ALL: 10-13! Agent Down at [LOC]! ALL AVAILABLE UNITS RESPOND CODE 3!</div></div>
                             </div>
                         </div>
 
@@ -1322,97 +1207,257 @@
                 </div>
             </div>
 
-            <!-- MODAL 3: PENAL CODE & CITATION ENGINE -->
-            <div class="modal-content" id="modal-penal" style="max-width: 950px;">
+            <!-- MODAL 3: COMBINED PENAL & TRAFFIC CODE ENGINE -->
+            <div class="modal-content" id="modal-penal" style="max-width: 980px;">
                 <div class="modal-header">
-                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.4rem; margin-right:6px;">gavel</span> EN3 Penal Code &amp; Citation Engine</span>
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.4rem; margin-right:6px;">gavel</span> EN3 Legal Code &amp; Citation Engine</span>
                     <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
+                <div class="legal-engine-tab-bar">
+                    <button class="legal-tab-btn active" id="tab-btn-penal" onclick="window.app.switchLegalEngineTab('penal')">
+                        <span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.15rem;">gavel</span> Penal Code Engine
+                    </button>
+                    <button class="legal-tab-btn" id="tab-btn-traffic" onclick="window.app.switchLegalEngineTab('traffic')">
+                        <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem;">speed</span> Traffic Code Engine
+                    </button>
+                </div>
+
                 <div class="modal-body-scroll">
-                    <!-- Search Input -->
-                    <div class="penal-search-bar">
-                        <span class="material-symbols-outlined penal-search-icon">search</span>
-                        <input type="text" id="penal-search-input" class="penal-search-input" placeholder="Search by penal code (e.g. 2.6.4, 3.10), crime keyword, or remarks..." autocomplete="off">
+                    <!-- PANE 1: PENAL CODE ENGINE -->
+                    <div id="legal-engine-penal-pane">
+                        <!-- Search Input -->
+                        <div class="penal-search-bar">
+                            <span class="material-symbols-outlined penal-search-icon">search</span>
+                            <input type="text" id="penal-search-input" class="penal-search-input" placeholder="Search by penal code (e.g. 2.6.4, 3.10), crime keyword, or remarks..." autocomplete="off">
+                        </div>
+
+                        <!-- Category Chips Filter -->
+                        <div class="penal-categories-bar">
+                            <button class="penal-chip active" onclick="filterPenalCategory(this, 'ALL')">All Crimes (135)</button>
+                            <button class="penal-chip" onclick="filterPenalCategory(this, 'Crimes Against Society')">Crimes Against Society</button>
+                            <button class="penal-chip" onclick="filterPenalCategory(this, 'Crimes Against the State')">Crimes Against the State</button>
+                            <button class="penal-chip" onclick="filterPenalCategory(this, 'Malfeasance')">Malfeasance (Public Servants)</button>
+                            <button class="penal-chip" onclick="filterPenalCategory(this, 'Judicial & Statute Crimes')">Judicial &amp; Statute</button>
+                            <button class="penal-chip" onclick="filterPenalCategory(this, 'Traffic Regulations (Penal)')">Traffic Regulations</button>
+                        </div>
+
+                        <!-- Penal Code Table -->
+                        <div class="penal-table-container">
+                            <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 90px 1fr 100px 90px 65px 70px 40px; text-transform:uppercase; letter-spacing:0.5px;">
+                                <span>Code</span>
+                                <span>Law Description</span>
+                                <span>Fine</span>
+                                <span>Sentence</span>
+                                <span>Stars</span>
+                                <span>Bail</span>
+                                <span>Charge</span>
+                            </div>
+                            <div id="penal-table-body">
+                                <!-- Populated dynamically via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Live Citation / Booking Calculation Summary -->
+                        <div class="citation-summary-card">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:700; font-size:0.95rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                                    <span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.15rem;">calculate</span> Citation &amp; Charge Summary
+                                </span>
+                                <button class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedCharges()" style="color:#ef4444;">
+                                    <span class="material-symbols-outlined" style="font-size:0.85rem;">delete</span> Clear Selection
+                                </button>
+                            </div>
+
+                            <div class="citation-stats-grid">
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Total Fine</div>
+                                    <div class="citation-stat-val money" id="stat-total-fine">$0</div>
+                                </div>
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Total Sentence</div>
+                                    <div class="citation-stat-val sentence" id="stat-total-sentence">-</div>
+                                </div>
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Wanted Stars</div>
+                                    <div class="citation-stat-val stars" id="stat-max-stars">-</div>
+                                </div>
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Bail Eligibility</div>
+                                    <div class="citation-stat-val" id="stat-bail-status">-</div>
+                                </div>
+                            </div>
+
+                            <!-- Formatted In-Game PDA Text Box -->
+                            <div class="input-group" style="margin-top:0.4rem; margin-bottom:0;">
+                                <label style="display:flex; justify-content:space-between;">
+                                    <span>In-Game PDA Charge Format (Flex 'J' Muscle)</span>
+                                    <span style="color:var(--text-muted); font-size:0.7rem;">Ready to paste directly into PDA wanted issue</span>
+                                </label>
+                                <div id="citation-pda-text" style="background:rgba(3,7,18,0.7); border:1px solid var(--card-border); padding:0.75rem; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:#38bdf8; min-height:44px; word-break:break-all;">
+                                    Select one or more penal codes above to generate PDA citation charges...
+                                </div>
+                            </div>
+
+                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                                <button class="btn btn-primary" id="btn-copy-pda" style="flex:1; min-width:140px; padding:0.65rem;" onclick="window.app.copyPdaCitation()">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy for PDA (J)
+                                </button>
+                                <button class="btn btn-info discord-jump-btn" data-discord-channel="finelog" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('finelog')">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #fine-log
+                                </button>
+                                <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #arrest-logs
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Category Chips Filter -->
-                    <div class="penal-categories-bar">
-                        <button class="penal-chip active" onclick="filterPenalCategory(this, 'ALL')">All Crimes (135)</button>
-                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Crimes Against Society')">Crimes Against Society</button>
-                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Crimes Against the State')">Crimes Against the State</button>
-                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Malfeasance')">Malfeasance (Public Servants)</button>
-                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Judicial & Statute Crimes')">Judicial &amp; Statute</button>
-                        <button class="penal-chip" onclick="filterPenalCategory(this, 'Traffic Regulations (Penal)')">Traffic Regulations</button>
-                    </div>
-
-                    <!-- Penal Code Table -->
-                    <div class="penal-table-container">
-                        <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 90px 1fr 100px 90px 65px 70px 40px; text-transform:uppercase; letter-spacing:0.5px;">
-                            <span>Code</span>
-                            <span>Law Description</span>
-                            <span>Fine</span>
-                            <span>Sentence</span>
-                            <span>Stars</span>
-                            <span>Bail</span>
-                            <span>Charge</span>
-                        </div>
-                        <div id="penal-table-body">
-                            <!-- Populated dynamically via JS -->
-                        </div>
-                    </div>
-
-                    <!-- Live Citation / Booking Calculation Summary -->
-                    <div class="citation-summary-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:700; font-size:0.95rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
-                                <span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.15rem;">calculate</span> Citation &amp; Charge Summary
-                            </span>
-                            <button class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedCharges()" style="color:#ef4444;">
-                                <span class="material-symbols-outlined" style="font-size:0.85rem;">delete</span> Clear Selection
-                            </button>
-                        </div>
-
-                        <div class="citation-stats-grid">
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Total Fine</div>
-                                <div class="citation-stat-val money" id="stat-total-fine">$0</div>
+                    <!-- PANE 2: TRAFFIC CODE ENGINE -->
+                    <div id="legal-engine-traffic-pane" style="display:none;">
+                        <!-- Speed Limits & Impound Quick Utilities Strip -->
+                        <div style="display:grid; grid-template-columns: 1fr 1.25fr; gap:0.75rem; margin-bottom:0.75rem;">
+                            <!-- Speed Limits Cards -->
+                            <div class="glass-section" style="padding:0.75rem; display:flex; flex-direction:column; justify-content:space-between; gap:0.4rem;">
+                                <div style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:4px;">
+                                    <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1rem;">radar</span> EN3 Radar &amp; Speed Limits
+                                </div>
+                                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.4rem; text-align:center;">
+                                    <div style="background:rgba(3,7,18,0.55); border:1px solid var(--card-border); padding:0.45rem 0.25rem; border-radius:8px;">
+                                        <div style="font-size:0.64rem; color:var(--text-muted); font-weight:700;">PUBLIC</div>
+                                        <div style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#38bdf8;">140</div>
+                                        <div style="font-size:0.58rem; color:var(--text-muted);">km/h max</div>
+                                    </div>
+                                    <div style="background:rgba(3,7,18,0.55); border:1px solid var(--card-border); padding:0.45rem 0.25rem; border-radius:8px;">
+                                        <div style="font-size:0.64rem; color:var(--text-muted); font-weight:700;">HIGHWAYS</div>
+                                        <div style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#10b981;">200</div>
+                                        <div style="font-size:0.58rem; color:var(--text-muted);">km/h max</div>
+                                    </div>
+                                    <div style="background:rgba(3,7,18,0.55); border:1px solid var(--card-border); padding:0.45rem 0.25rem; border-radius:8px;">
+                                        <div style="font-size:0.64rem; color:var(--text-muted); font-weight:700;">SPECIAL §5.4</div>
+                                        <div style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#f59e0b;">90</div>
+                                        <div style="font-size:0.58rem; color:var(--text-muted);">km/h max</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Total Sentence</div>
-                                <div class="citation-stat-val sentence" id="stat-total-sentence">-</div>
-                            </div>
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Wanted Stars</div>
-                                <div class="citation-stat-val stars" id="stat-max-stars">-</div>
-                            </div>
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Bail Eligibility</div>
-                                <div class="citation-stat-val" id="stat-bail-status">-</div>
+
+                            <!-- Impound Fee Calculator -->
+                            <div class="glass-section" style="padding:0.75rem; border-color:rgba(56,189,248,0.3); display:flex; flex-direction:column; justify-content:space-between; gap:0.4rem;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:4px;">
+                                        <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1rem;">calculate</span> Impound Fee (T.C. 8.1 - 10%)
+                                    </span>
+                                    <button class="btn btn-warning btn-xs discord-jump-btn" data-discord-channel="towing" onclick="window.app.openDiscordChannel('towing')">
+                                        <span class="material-symbols-outlined" style="font-size:0.85rem;">upload_file</span> #towing-logs
+                                    </button>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; align-items:center;">
+                                    <div class="input-group" style="margin-bottom:0;">
+                                        <input type="number" id="impound-state-value" placeholder="Vehicle State Val ($)..." style="padding:0.45rem 0.65rem; font-size:0.82rem;" oninput="window.app.calculateImpoundFee(this.value)">
+                                    </div>
+                                    <div style="background:rgba(3,7,18,0.6); border:1px solid var(--card-border); padding:0.45rem 0.65rem; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:0.7rem; color:var(--text-muted);">Impound Fee:</span>
+                                        <span id="impound-fee-result" style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#34d399;">$0</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Formatted In-Game PDA Text Box -->
-                        <div class="input-group" style="margin-top:0.4rem; margin-bottom:0;">
-                            <label style="display:flex; justify-content:space-between;">
-                                <span>In-Game PDA Charge Format (Flex 'J' Muscle)</span>
-                                <span style="color:var(--text-muted); font-size:0.7rem;">Ready to paste directly into PDA wanted issue</span>
-                            </label>
-                            <div id="citation-pda-text" style="background:rgba(3,7,18,0.7); border:1px solid var(--card-border); padding:0.75rem; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:#38bdf8; min-height:44px; word-break:break-all;">
-                                Select one or more penal codes above to generate PDA citation charges...
+                        <!-- Search Input -->
+                        <div class="penal-search-bar">
+                            <span class="material-symbols-outlined penal-search-icon">search</span>
+                            <input type="text" id="traffic-search-input" class="penal-search-input" placeholder="Search by traffic code (e.g. 3.2.1, 6.2, DUI, Speeding), crime keyword, or remarks..." autocomplete="off">
+                        </div>
+
+                        <!-- Category Chips Filter -->
+                        <div class="penal-categories-bar" id="traffic-categories-bar">
+                            <button class="penal-chip active" onclick="filterTrafficCategory(this, 'ALL')">All Traffic Violations (<span id="traffic-total-count">40</span>)</button>
+                            <button class="penal-chip" onclick="filterTrafficCategory(this, 'Moving & Driving Violations')">Moving &amp; Driving</button>
+                            <button class="penal-chip" onclick="filterTrafficCategory(this, 'Parking & Stopping Violations')">Parking &amp; Stopping</button>
+                            <button class="penal-chip" onclick="filterTrafficCategory(this, 'Traffic Regulations (Penal)')">Penal Speed &amp; Traffic (P.C. 6.x)</button>
+                            <button class="penal-chip" onclick="filterTrafficCategory(this, 'Towing & Impounds')">Towing &amp; Impounds</button>
+                        </div>
+
+                        <!-- Traffic Code Table -->
+                        <div class="penal-table-container">
+                            <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 120px 1fr 110px 90px 65px 95px 40px; text-transform:uppercase; letter-spacing:0.5px;">
+                                <span>Code</span>
+                                <span>Law Description</span>
+                                <span>Fine</span>
+                                <span>Sentence</span>
+                                <span>Stars</span>
+                                <span>Tow / Bail</span>
+                                <span>Charge</span>
+                            </div>
+                            <div id="traffic-table-body">
+                                <!-- Populated dynamically via JS -->
                             </div>
                         </div>
 
-                        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                            <button class="btn btn-primary" id="btn-copy-pda" style="flex:1; min-width:140px; padding:0.65rem;" onclick="window.app.copyPdaCitation()">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy for PDA (J)
-                            </button>
-                            <button class="btn btn-info discord-jump-btn" data-discord-channel="finelog" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('finelog')">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #fine-log
-                            </button>
-                            <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #arrest-logs
-                            </button>
+                        <!-- Live Citation / Booking Calculation Summary -->
+                        <div class="citation-summary-card" style="border-color: rgba(56,189,248,0.35);">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:700; font-size:0.95rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                                    <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem;">calculate</span> Traffic Citation &amp; Charge Summary
+                                </span>
+                                <div style="display:flex; gap:0.5rem; align-items:center;">
+                                    <button class="btn btn-secondary btn-xs" onclick="window.app.transferTrafficToPenalEngine()" title="Copy selected traffic charges into the Penal Code engine" style="color:#38bdf8;">
+                                        <span class="material-symbols-outlined" style="font-size:0.85rem;">swap_horiz</span> Send to Penal Engine
+                                    </button>
+                                    <button class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedTrafficCharges()" style="color:#ef4444;">
+                                        <span class="material-symbols-outlined" style="font-size:0.85rem;">delete</span> Clear Selection
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="citation-stats-grid" style="grid-template-columns: repeat(5, 1fr);">
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Total Fine</div>
+                                    <div class="citation-stat-val money" id="traffic-stat-total-fine">$0</div>
+                                </div>
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Total Sentence</div>
+                                    <div class="citation-stat-val sentence" id="traffic-stat-total-sentence">-</div>
+                                </div>
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Wanted Stars</div>
+                                    <div class="citation-stat-val stars" id="traffic-stat-max-stars">-</div>
+                                </div>
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Towing Action</div>
+                                    <div class="citation-stat-val" id="traffic-stat-towing">-</div>
+                                </div>
+                                <div class="citation-stat-box">
+                                    <div class="citation-stat-title">Bail Status</div>
+                                    <div class="citation-stat-val" id="traffic-stat-bail">-</div>
+                                </div>
+                            </div>
+
+                            <!-- Formatted In-Game PDA Text Box -->
+                            <div class="input-group" style="margin-top:0.4rem; margin-bottom:0;">
+                                <label style="display:flex; justify-content:space-between;">
+                                    <span>In-Game PDA Citation Format (Flex 'J' Muscle)</span>
+                                    <span style="color:var(--text-muted); font-size:0.7rem;">Ready to paste directly into PDA wanted issue / traffic fine</span>
+                                </label>
+                                <div id="traffic-citation-pda-text" style="background:rgba(3,7,18,0.7); border:1px solid var(--card-border); padding:0.75rem; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:#38bdf8; min-height:44px; word-break:break-all;">
+                                    Select one or more traffic codes or regulations above to generate PDA citation charges...
+                                </div>
+                            </div>
+
+                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+                                <button class="btn btn-primary" id="btn-copy-traffic-pda" style="flex:1; min-width:140px; padding:0.65rem;" onclick="window.app.copyTrafficPdaCitation()">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy for PDA (J)
+                                </button>
+                                <button class="btn btn-info discord-jump-btn" data-discord-channel="finelog" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('finelog')">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #fine-log
+                                </button>
+                                <button class="btn btn-warning discord-jump-btn" data-discord-channel="towing" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('towing')">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">upload_file</span> #towing-logs
+                                </button>
+                                <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #arrest-logs
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1556,160 +1601,7 @@ Do you understand the rights I just read to you?"
                 </div>
             </div>
 
-            <!-- MODAL 5: TRAFFIC CODES & REGULATIONS ENGINE -->
-            <div class="modal-content" id="modal-traffic" style="max-width: 950px;">
-                <div class="modal-header">
-                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.4rem; margin-right:6px;">speed</span> EN3 Traffic Codes &amp; Regulations Engine</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
-                </div>
 
-                <div class="modal-body-scroll">
-                    <!-- Speed Limits & Impound Quick Utilities Strip -->
-                    <div style="display:grid; grid-template-columns: 1fr 1.25fr; gap:0.75rem; margin-bottom:0.75rem;">
-                        <!-- Speed Limits Cards -->
-                        <div class="glass-section" style="padding:0.75rem; display:flex; flex-direction:column; justify-content:space-between; gap:0.4rem;">
-                            <div style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:4px;">
-                                <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1rem;">radar</span> EN3 Radar &amp; Speed Limits
-                            </div>
-                            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.4rem; text-align:center;">
-                                <div style="background:rgba(3,7,18,0.55); border:1px solid var(--card-border); padding:0.45rem 0.25rem; border-radius:8px;">
-                                    <div style="font-size:0.64rem; color:var(--text-muted); font-weight:700;">PUBLIC</div>
-                                    <div style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#38bdf8;">140</div>
-                                    <div style="font-size:0.58rem; color:var(--text-muted);">km/h max</div>
-                                </div>
-                                <div style="background:rgba(3,7,18,0.55); border:1px solid var(--card-border); padding:0.45rem 0.25rem; border-radius:8px;">
-                                    <div style="font-size:0.64rem; color:var(--text-muted); font-weight:700;">HIGHWAYS</div>
-                                    <div style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#10b981;">200</div>
-                                    <div style="font-size:0.58rem; color:var(--text-muted);">km/h max</div>
-                                </div>
-                                <div style="background:rgba(3,7,18,0.55); border:1px solid var(--card-border); padding:0.45rem 0.25rem; border-radius:8px;">
-                                    <div style="font-size:0.64rem; color:var(--text-muted); font-weight:700;">SPECIAL §5.4</div>
-                                    <div style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#f59e0b;">90</div>
-                                    <div style="font-size:0.58rem; color:var(--text-muted);">km/h max</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Impound Fee Calculator -->
-                        <div class="glass-section" style="padding:0.75rem; border-color:rgba(56,189,248,0.3); display:flex; flex-direction:column; justify-content:space-between; gap:0.4rem;">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:4px;">
-                                    <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1rem;">calculate</span> Impound Fee (T.C. 8.1 - 10%)
-                                </span>
-                                <button class="btn btn-warning btn-xs discord-jump-btn" data-discord-channel="towing" onclick="window.app.openDiscordChannel('towing')">
-                                    <span class="material-symbols-outlined" style="font-size:0.85rem;">upload_file</span> #towing-logs
-                                </button>
-                            </div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; align-items:center;">
-                                <div class="input-group" style="margin-bottom:0;">
-                                    <input type="number" id="impound-state-value" placeholder="Vehicle State Val ($)..." style="padding:0.45rem 0.65rem; font-size:0.82rem;" oninput="window.app.calculateImpoundFee(this.value)">
-                                </div>
-                                <div style="background:rgba(3,7,18,0.6); border:1px solid var(--card-border); padding:0.45rem 0.65rem; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                                    <span style="font-size:0.7rem; color:var(--text-muted);">Impound Fee:</span>
-                                    <span id="impound-fee-result" style="font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:800; color:#34d399;">$0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Search Input -->
-                    <div class="penal-search-bar">
-                        <span class="material-symbols-outlined penal-search-icon">search</span>
-                        <input type="text" id="traffic-search-input" class="penal-search-input" placeholder="Search by traffic code (e.g. 3.2.1, 6.2, DUI, Speeding), crime keyword, or remarks..." autocomplete="off">
-                    </div>
-
-                    <!-- Category Chips Filter -->
-                    <div class="penal-categories-bar" id="traffic-categories-bar">
-                        <button class="penal-chip active" onclick="filterTrafficCategory(this, 'ALL')">All Traffic Violations (<span id="traffic-total-count">40</span>)</button>
-                        <button class="penal-chip" onclick="filterTrafficCategory(this, 'Moving & Driving Violations')">Moving &amp; Driving</button>
-                        <button class="penal-chip" onclick="filterTrafficCategory(this, 'Parking & Stopping Violations')">Parking &amp; Stopping</button>
-                        <button class="penal-chip" onclick="filterTrafficCategory(this, 'Traffic Regulations (Penal)')">Penal Speed &amp; Traffic (P.C. 6.x)</button>
-                        <button class="penal-chip" onclick="filterTrafficCategory(this, 'Towing & Impounds')">Towing &amp; Impounds</button>
-                    </div>
-
-                    <!-- Traffic Code Table -->
-                    <div class="penal-table-container">
-                        <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 120px 1fr 110px 90px 65px 95px 40px; text-transform:uppercase; letter-spacing:0.5px;">
-                            <span>Code</span>
-                            <span>Law Description</span>
-                            <span>Fine</span>
-                            <span>Sentence</span>
-                            <span>Stars</span>
-                            <span>Tow / Bail</span>
-                            <span>Charge</span>
-                        </div>
-                        <div id="traffic-table-body">
-                            <!-- Populated dynamically via JS -->
-                        </div>
-                    </div>
-
-                    <!-- Live Citation / Booking Calculation Summary -->
-                    <div class="citation-summary-card" style="border-color: rgba(56,189,248,0.35);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:700; font-size:0.95rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
-                                <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem;">calculate</span> Traffic Citation &amp; Charge Summary
-                            </span>
-                            <div style="display:flex; gap:0.5rem; align-items:center;">
-                                <button class="btn btn-secondary btn-xs" onclick="window.app.transferTrafficToPenalEngine()" title="Copy selected traffic charges into the Penal Code engine" style="color:#38bdf8;">
-                                    <span class="material-symbols-outlined" style="font-size:0.85rem;">swap_horiz</span> Send to Penal Engine
-                                </button>
-                                <button class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedTrafficCharges()" style="color:#ef4444;">
-                                    <span class="material-symbols-outlined" style="font-size:0.85rem;">delete</span> Clear Selection
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="citation-stats-grid" style="grid-template-columns: repeat(5, 1fr);">
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Total Fine</div>
-                                <div class="citation-stat-val money" id="traffic-stat-total-fine">$0</div>
-                            </div>
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Total Sentence</div>
-                                <div class="citation-stat-val sentence" id="traffic-stat-total-sentence">-</div>
-                            </div>
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Wanted Stars</div>
-                                <div class="citation-stat-val stars" id="traffic-stat-max-stars">-</div>
-                            </div>
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Towing Action</div>
-                                <div class="citation-stat-val" id="traffic-stat-towing">-</div>
-                            </div>
-                            <div class="citation-stat-box">
-                                <div class="citation-stat-title">Bail Status</div>
-                                <div class="citation-stat-val" id="traffic-stat-bail">-</div>
-                            </div>
-                        </div>
-
-                        <!-- Formatted In-Game PDA Text Box -->
-                        <div class="input-group" style="margin-top:0.4rem; margin-bottom:0;">
-                            <label style="display:flex; justify-content:space-between;">
-                                <span>In-Game PDA Citation Format (Flex 'J' Muscle)</span>
-                                <span style="color:var(--text-muted); font-size:0.7rem;">Ready to paste directly into PDA wanted issue / traffic fine</span>
-                            </label>
-                            <div id="traffic-citation-pda-text" style="background:rgba(3,7,18,0.7); border:1px solid var(--card-border); padding:0.75rem; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:#38bdf8; min-height:44px; word-break:break-all;">
-                                Select one or more traffic codes or regulations above to generate PDA citation charges...
-                            </div>
-                        </div>
-
-                        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                            <button class="btn btn-primary" id="btn-copy-traffic-pda" style="flex:1; min-width:140px; padding:0.65rem;" onclick="window.app.copyTrafficPdaCitation()">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy for PDA (J)
-                            </button>
-                            <button class="btn btn-info discord-jump-btn" data-discord-channel="finelog" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('finelog')">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #fine-log
-                            </button>
-                            <button class="btn btn-warning discord-jump-btn" data-discord-channel="towing" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('towing')">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">upload_file</span> #towing-logs
-                            </button>
-                            <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #arrest-logs
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- MODAL 6: ARTICLE 7 PARKING REGULATIONS -->
             <div class="modal-content" id="modal-article7" style="max-width: 900px;">
@@ -1802,6 +1694,21 @@ Do you understand the rights I just read to you?"
                             <div class="input-group">
                                 <label>Badge Number</label>
                                 <input type="text" id="settingBadgeNum" placeholder="e.g. 701">
+                            </div>
+                            <div class="input-group">
+                                <label>Duty / Job Assignment</label>
+                                <select id="settingJobType" style="width:100%; padding:0.6rem 0.8rem; background:rgba(3,7,18,0.7); border:1px solid var(--card-border); border-radius:10px; color:var(--text-main); font-size:0.88rem; outline:none;">
+                                    <option value="" disabled selected>Select Duty...</option>
+                                    <option value="Highway Patrol">Highway Patrol</option>
+                                    <option value="City Patrol">City Patrol</option>
+                                    <option value="Traffic Enforcement">Traffic Enforcement</option>
+                                    <option value="Speed Radar Enforcement">Speed Radar Enforcement</option>
+                                    <option value="Detective Bureau">Detective Bureau</option>
+                                    <option value="Air Support">Air Support</option>
+                                    <option value="DOC Transport">DOC Transport</option>
+                                    <option value="HQ Front Desk">HQ Front Desk</option>
+                                    <option value="Training / HR">Training / HR</option>
+                                </select>
                             </div>
                         </div>
 
@@ -1908,17 +1815,20 @@ Do you understand the rights I just read to you?"
             </div>
 
             <!-- MODAL 9: QUICK NOTEPAD -->
-            <div class="modal-content" id="modal-notes" style="max-width: 720px;">
+            <div class="modal-content" id="modal-notes" style="max-width: 820px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; margin-right:6px;">edit_note</span> Quick Officer Notepad</span>
                     <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
-                <div class="modal-body-scroll">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; gap: 0.5rem;">
+                <div class="modal-body-scroll" style="display:flex; flex-direction:column; gap:0.75rem;">
+                    <div class="notepad-toolbar">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                             <button class="btn btn-secondary btn-sm" onclick="window.app.copyQuickNotes()">
                                 <span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy All
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="window.app.insertNotepadTimestamp()" title="Insert current IC timestamp">
+                                <span class="material-symbols-outlined" style="font-size:0.95rem;">schedule</span> Insert IC Time
                             </button>
                             <button class="btn btn-secondary btn-sm" onclick="window.app.clearQuickNotes()" style="color: #ef4444;">
                                 <span class="material-symbols-outlined" style="font-size:0.95rem;">delete_sweep</span> Clear
@@ -1931,9 +1841,147 @@ Do you understand the rights I just read to you?"
 
                     <textarea id="quick-notes-textarea" class="quick-notes-editor" placeholder="Write or paste your active suspect notes, badge numbers, witness statements, license plate numbers, or arrest log drafts here... Everything is auto-saved locally in real-time." spellcheck="false"></textarea>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; color: var(--text-muted);">
+                    <div class="notepad-footer">
                         <span id="notes-char-count">0 characters | 0 lines</span>
                         <span style="color: #94a3b8; font-style: italic;">Auto-saved to local browser storage</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 10: MORE TOOLS & SECONDARY UTILITIES -->
+            <div class="modal-content" id="modal-more" style="max-width: 900px;">
+                <div class="modal-header">
+                    <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">grid_view</span> Department Utilities &amp; Secondary Tools</span>
+                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+
+                <div class="modal-body-scroll">
+                    <div class="more-tools-grid">
+                        <!-- Tool 1: Arrest 25-Min Timer -->
+                        <div class="tactical-card" onclick="closeModals(); openModal('modal-arrest');">
+                            <div class="card-glow glow-rose"></div>
+                            <div class="card-header-bar">
+                                <span class="card-badge badge-rose">CUSTODY</span>
+                                <span class="card-tag">SEC-01</span>
+                            </div>
+                            <div class="card-icon-wrap icon-rose">
+                                <span class="material-symbols-outlined icon-gradient-rose">lock_clock</span>
+                            </div>
+                            <h3 class="card-title">25-MIN ARREST TIMER</h3>
+                            <p class="card-desc">Step-by-step custody countdown, lawyer &amp; medical pause controls, and Miranda checkpoints.</p>
+                            <div class="card-footer-action">
+                                <span>Launch Timer</span>
+                                <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Tool 2: Uniform & Dress Codes -->
+                        <div class="tactical-card" onclick="closeModals(); openModal('modal-dresscodes');">
+                            <div class="card-glow glow-gold"></div>
+                            <div class="card-header-bar">
+                                <span class="card-badge badge-gold">UNIFORM</span>
+                                <span class="card-tag">SEC-02</span>
+                            </div>
+                            <div class="card-icon-wrap icon-gold">
+                                <span class="material-symbols-outlined icon-gradient-gold">apparel</span>
+                            </div>
+                            <h3 class="card-title">DRESS CODES</h3>
+                            <p class="card-desc">Standard issue clothing numbers for ranks 3 to 22: Trainees, Troopers, NCOs, and High Command.</p>
+                            <div class="card-footer-action">
+                                <span>View Uniforms</span>
+                                <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Tool 3: Article 7 Parking Regulations -->
+                        <div class="tactical-card" onclick="closeModals(); openModal('modal-article7');">
+                            <div class="card-glow glow-emerald"></div>
+                            <div class="card-header-bar">
+                                <span class="card-badge badge-emerald">PARKING</span>
+                                <span class="card-tag">SEC-03</span>
+                            </div>
+                            <div class="card-icon-wrap icon-emerald">
+                                <span class="material-symbols-outlined icon-gradient-emerald">local_parking</span>
+                            </div>
+                            <h3 class="card-title">ARTICLE 7 PARKING</h3>
+                            <p class="card-desc">State of San Andreas official parking regulations, yellow zones, towing rules, and red zones.</p>
+                            <div class="card-footer-action">
+                                <span>View Regulations</span>
+                                <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Tool 4: Prohibited Items (§2.4) -->
+                        <div class="tactical-card" onclick="closeModals(); openModal('modal-prohibited');">
+                            <div class="card-glow glow-rose"></div>
+                            <div class="card-header-bar">
+                                <span class="card-badge badge-rose">LEGAL</span>
+                                <span class="card-tag">SEC-04</span>
+                            </div>
+                            <div class="card-icon-wrap icon-rose">
+                                <span class="material-symbols-outlined icon-gradient-rose">do_not_disturb_on</span>
+                            </div>
+                            <h3 class="card-title">PROHIBITED ITEMS</h3>
+                            <p class="card-desc">Section 2.4 illegal weapons, class-A narcotics, modified armor, lockpicks, and scanners list.</p>
+                            <div class="card-footer-action">
+                                <span>View Prohibited</span>
+                                <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Tool 5: Field Notepad -->
+                        <div class="tactical-card" onclick="closeModals(); openModal('modal-notes');">
+                            <div class="card-glow glow-amber"></div>
+                            <div class="card-header-bar">
+                                <span class="card-badge badge-amber">RECORDS</span>
+                                <span class="card-tag">SEC-05</span>
+                            </div>
+                            <div class="card-icon-wrap icon-amber">
+                                <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
+                            </div>
+                            <h3 class="card-title">FIELD NOTEPAD</h3>
+                            <p class="card-desc">Live auto-saved suspect log, witness statements, license plate memos, and custody notes.</p>
+                            <div class="card-footer-action">
+                                <span>Open Notepad</span>
+                                <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Tool 6: Settings & Profile -->
+                        <div class="tactical-card" onclick="closeModals(); openModal('modal-settings');">
+                            <div class="card-glow glow-cyan"></div>
+                            <div class="card-header-bar">
+                                <span class="card-badge badge-cyan">SYSTEM</span>
+                                <span class="card-tag">SEC-06</span>
+                            </div>
+                            <div class="card-icon-wrap icon-cyan">
+                                <span class="material-symbols-outlined icon-gradient-cyan">tune</span>
+                            </div>
+                            <h3 class="card-title">SETTINGS &amp; CONFIG</h3>
+                            <p class="card-desc">Trooper callsign, badge number, Discord webhook channel links, sound FX, and data backups.</p>
+                            <div class="card-footer-action">
+                                <span>Open Settings</span>
+                                <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                            </div>
+                        </div>
+
+                        <!-- Tool 7: About SAHP Companion -->
+                        <div class="tactical-card" onclick="closeModals(); openAboutTeam();">
+                            <div class="card-glow glow-gold"></div>
+                            <div class="card-header-bar">
+                                <span class="card-badge badge-gold">MANUAL</span>
+                                <span class="card-tag">SEC-07</span>
+                            </div>
+                            <div class="card-icon-wrap icon-gold">
+                                <span class="material-symbols-outlined icon-gradient-gold">local_police</span>
+                            </div>
+                            <h3 class="card-title">ABOUT SAHP</h3>
+                            <p class="card-desc">Department doctrine, jurisdiction overview, patrol guidelines, and companion guide manual.</p>
+                            <div class="card-footer-action">
+                                <span>Open About</span>
+                                <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1990,6 +2038,12 @@ Do you understand the rights I just read to you?"
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Tactical Notification Toast -->
+    <div id="tactical-toast" class="tactical-toast">
+        <span class="material-symbols-outlined" style="font-size:1.15rem; color:#38bdf8;">info</span>
+        <span id="toast-message">Notification</span>
     </div>
 
     <!-- Scripts -->

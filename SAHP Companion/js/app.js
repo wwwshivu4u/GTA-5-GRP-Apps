@@ -94,6 +94,7 @@
                 soundEnabled: true,
                 officerName: '',
                 badgeNum: '',
+                jobType: '',
                 discordServerId: DEFAULT_DISCORD_SERVER_ID,
                 discordChannels: { ...DEFAULT_DISCORD_CHANNELS },
                 shiftRates: { ...DEFAULT_SHIFT_RATES },
@@ -264,6 +265,13 @@
         const badgeInput = document.getElementById('settingBadgeNum');
         if (badgeInput) badgeInput.value = state.badgeNum || '';
 
+        // Job / Duty Assignment
+        const topbarJob = document.getElementById('topbar-job-type');
+        if (topbarJob) topbarJob.value = state.jobType || '';
+
+        const settingJob = document.getElementById('settingJobType');
+        if (settingJob) settingJob.value = state.jobType || '';
+
         updateOfficerTopBarBadge();
 
         // Boot Screen Toggle
@@ -370,6 +378,13 @@
                 state.badgeNum = e.target.value.trim();
                 stateManager.save();
                 updateOfficerTopBarBadge();
+            });
+        }
+
+        const settingJob = document.getElementById('settingJobType');
+        if (settingJob) {
+            settingJob.addEventListener('change', (e) => {
+                setJobType(e.target.value);
             });
         }
 
@@ -577,10 +592,32 @@
         }
     }
 
+    function setJobType(val) {
+        state.jobType = (val || '').trim();
+        stateManager.save();
+        const topbarJob = document.getElementById('topbar-job-type');
+        if (topbarJob && topbarJob.value !== state.jobType) topbarJob.value = state.jobType;
+        const settingJob = document.getElementById('settingJobType');
+        if (settingJob && settingJob.value !== state.jobType) settingJob.value = state.jobType;
+    }
+
     function setDutyStatusUI(isOnDuty) {
+        const dutyBtn = document.getElementById('topbar-duty-btn');
         const dutyPill = document.getElementById('modal-duty-status-pill');
         const topDutyPill = document.getElementById('topbar-duty-status-pill');
         const topDutyText = document.getElementById('topbar-duty-status-text');
+
+        if (dutyBtn) {
+            if (isOnDuty) {
+                dutyBtn.classList.remove('off-duty');
+                dutyBtn.classList.add('on-duty');
+                dutyBtn.setAttribute('title', 'Active: ON DUTY (Click to switch OFF DUTY & copy 10-9 command)');
+            } else {
+                dutyBtn.classList.remove('on-duty');
+                dutyBtn.classList.add('off-duty');
+                dutyBtn.setAttribute('title', 'Inactive: OFF DUTY (Click to switch ON DUTY & copy 10-8 command)');
+            }
+        }
 
         if (dutyPill) {
             dutyPill.className = `duty-pill ${isOnDuty ? 'on-duty' : 'off-duty'}`;
@@ -597,18 +634,64 @@
 
     function toggleDutyStatus() {
         const isCurrentlyOnDuty = Boolean(state.dutyStartTime);
-        if (isCurrentlyOnDuty) {
-            if (confirm('End your active patrol shift and switch to OFF DUTY?')) {
-                state.dutyStartTime = null;
-                stateManager.save();
-                playSound('playDutyChime');
-                setDutyStatusUI(false);
+
+        if (!isCurrentlyOnDuty) {
+            // User wants to go ON DUTY
+            // 1. Validate Badge ID
+            const badge = (state.badgeNum || '').trim();
+            if (!badge) {
+                showNotificationToast('Please configure your Badge ID in Settings first!', 'warning');
+                if (window.soundSystem && state.soundEnabled !== false) {
+                    window.soundSystem.playTimerAlert();
+                }
+                openModal('modal-settings');
+                const badgeInput = document.getElementById('settingBadgeNum');
+                if (badgeInput) {
+                    badgeInput.focus();
+                    badgeInput.style.borderColor = '#ef4444';
+                    setTimeout(() => { badgeInput.style.borderColor = ''; }, 2500);
+                }
+                return;
             }
-        } else {
+
+            // 2. Validate Job Type
+            const jobType = (state.jobType || (document.getElementById('topbar-job-type')?.value) || '').trim();
+            if (!jobType) {
+                showNotificationToast('Please select your Duty / Job Assignment first!', 'warning');
+                if (window.soundSystem && state.soundEnabled !== false) {
+                    window.soundSystem.playTimerAlert();
+                }
+                const topbarJob = document.getElementById('topbar-job-type');
+                if (topbarJob) {
+                    topbarJob.focus();
+                    topbarJob.style.borderColor = '#ef4444';
+                    setTimeout(() => { topbarJob.style.borderColor = ''; }, 2500);
+                }
+                return;
+            }
+
+            // 3. Format: "10-8 {Duty name} {current IC time}"
+            const ic = getICTime();
+            const cmd = `10-8 ${jobType} ${ic.formattedTime}`;
+            copySimple(cmd);
+
             state.dutyStartTime = Date.now();
             stateManager.save();
             playSound('playDutyChime');
             setDutyStatusUI(true);
+            showNotificationToast(`ON DUTY: Copied "${cmd}" to clipboard`, 'check_circle');
+        } else {
+            // User wants to go OFF DUTY
+            const jobType = (state.jobType || (document.getElementById('topbar-job-type')?.value) || 'Patrol').trim();
+            const ic = getICTime();
+            const cmd = `10-9 ${jobType} ${ic.formattedTime}`;
+            copySimple(cmd);
+
+            state.dutyStartTime = null;
+            stateManager.save();
+            playSound('playDutyChime');
+            setDutyStatusUI(false);
+            showNotificationToast(`OFF DUTY: Copied "${cmd}" to clipboard`, 'power_settings_new');
         }
     }
 
@@ -1354,12 +1437,33 @@
 
     function copyQuickNotes() {
         const textarea = document.getElementById('quick-notes-textarea');
-        if (!textarea || !textarea.value) return;
+        if (!textarea || !textarea.value) {
+            showNotificationToast('Notepad is empty', 'info');
+            return;
+        }
 
         copyTextToClipboard(textarea.value).then(() => {
             playSound('playCopyBeep');
-            alert('Notepad content copied to clipboard!');
+            showNotificationToast('Notepad copied to clipboard!', 'content_copy');
         });
+    }
+
+    function insertNotepadTimestamp() {
+        const textarea = document.getElementById('quick-notes-textarea');
+        if (!textarea) return;
+        const ic = getICTime();
+        const stamp = `[IC ${ic.formattedTime}] `;
+        const start = textarea.selectionStart || 0;
+        const end = textarea.selectionEnd || 0;
+        const val = textarea.value || '';
+        textarea.value = val.substring(0, start) + stamp + val.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + stamp.length;
+        textarea.focus();
+        state.quickNotes = textarea.value;
+        stateManager.save();
+        updateNotepadCounts();
+        playSound('playCopyBeep');
+        showNotificationToast(`Inserted timestamp ${stamp.trim()}`, 'schedule');
     }
 
     function clearQuickNotes() {
@@ -1369,6 +1473,7 @@
         state.quickNotes = '';
         stateManager.save();
         updateNotepadCounts();
+        showNotificationToast('Notepad cleared', 'delete_sweep');
     }
 
     // -----------------------------------------------------
@@ -1534,6 +1639,11 @@
         }
 
         open(modalId) {
+            if (modalId === 'modal-traffic') {
+                modalId = 'modal-penal';
+                switchLegalEngineTab('traffic');
+            }
+
             if (this.closeTimeout) {
                 clearTimeout(this.closeTimeout);
                 this.closeTimeout = null;
@@ -1629,11 +1739,40 @@
         }
     }
 
+    function switchLegalEngineTab(tabName) {
+        const penalBtn = document.getElementById('tab-btn-penal');
+        const trafficBtn = document.getElementById('tab-btn-traffic');
+        const penalPane = document.getElementById('legal-engine-penal-pane');
+        const trafficPane = document.getElementById('legal-engine-traffic-pane');
+
+        if (tabName === 'traffic') {
+            if (penalBtn) penalBtn.classList.remove('active');
+            if (trafficBtn) trafficBtn.classList.add('active');
+            if (penalPane) penalPane.style.display = 'none';
+            if (trafficPane) trafficPane.style.display = 'block';
+            renderTrafficCodes();
+        } else {
+            if (trafficBtn) trafficBtn.classList.remove('active');
+            if (penalBtn) penalBtn.classList.add('active');
+            if (trafficPane) trafficPane.style.display = 'none';
+            if (penalPane) penalPane.style.display = 'block';
+            renderPenalCodes();
+        }
+
+        if (window.soundSystem && state.soundEnabled !== false) {
+            window.soundSystem.playRadioClick();
+        }
+    }
+
     const modalManager = new ModalManager();
 
     window.app = {
         state,
         stateManager,
+        setJobType,
+        switchLegalEngineTab,
+        insertNotepadTimestamp,
+        showNotificationToast,
         toggleDutyStatus,
         toggleAudio,
         startShift,
@@ -1729,6 +1868,12 @@
 // 16. MODAL HELPERS & GLOBAL UI EVENT WRAPPERS
 // -----------------------------------------------------
 function openModal(modalId) {
+    if (modalId === 'modal-traffic') {
+        modalId = 'modal-penal';
+        if (window.app && window.app.switchLegalEngineTab) {
+            window.app.switchLegalEngineTab('traffic');
+        }
+    }
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
     if (!overlay || !modal) return;
@@ -1887,13 +2032,50 @@ function searchDresscodes(query) {
     });
 }
 
+function showNotificationToast(msg, icon = 'content_copy') {
+    const toast = document.getElementById('tactical-toast');
+    if (!toast) return;
+    const msgEl = document.getElementById('toast-message');
+    const iconEl = toast.querySelector('.material-symbols-outlined');
+    if (msgEl) msgEl.textContent = msg;
+    if (iconEl) iconEl.textContent = icon;
+    toast.classList.add('active');
+    if (window._toastTimer) clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => {
+        toast.classList.remove('active');
+    }, 2800);
+}
+
+function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.top = '-9999px';
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
+    } catch (err) {
+        console.error('Fallback copy failed', err);
+    }
+    document.body.removeChild(textArea);
+}
+
 function copySimple(text) {
+    if (!text) return;
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text);
+        navigator.clipboard.writeText(text).catch(() => {
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
     }
     if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
         window.soundSystem.playCopyBeep();
     }
+    showNotificationToast(`Copied: ${text.length > 55 ? text.substring(0, 52) + '...' : text}`, 'content_copy');
 }
 
 function openAboutTeam() {
