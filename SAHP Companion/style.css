@@ -831,6 +831,19 @@ body::before {
     box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
 }
 
+.dock-btn.dock-search-btn {
+    border-color: rgba(56, 189, 248, 0.45);
+    background: rgba(56, 189, 248, 0.12);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+.dock-btn.dock-search-btn:hover {
+    border-color: var(--secondary);
+    background: rgba(56, 189, 248, 0.28);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+    transform: translateY(-2px) scale(1.08);
+}
+
 .dock-badge {
     position: absolute;
     top: -4px;
@@ -952,7 +965,7 @@ body::before {
 }
 
 .modal-content {
-    background: var(--surface);
+    background: #090e1a;
     border: 1px solid var(--card-border-glow);
     border-radius: 24px;
     width: 95%;
@@ -962,7 +975,7 @@ body::before {
     display: none;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(56, 189, 248, 0.15);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(56, 189, 248, 0.2);
     transform: translate3d(0, 24px, 0) scale(0.985);
     will-change: transform, opacity, filter;
     contain: layout style;
@@ -1148,14 +1161,14 @@ body::before {
 
 .modal-header {
     padding: 1.1rem 1.6rem;
-    border-bottom: 1px solid var(--card-border);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.25);
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: 0.5px;
-    background: rgba(15, 23, 42, 0.6);
+    background: #0d1527;
 }
 
 .modal-header .close-btn {
@@ -1188,6 +1201,7 @@ body::before {
     -webkit-overflow-scrolling: touch;
     contain: content;
     will-change: scroll-position;
+    background: #090e1a;
 }
 
 /* Custom Tactical Scrollbar */
@@ -2763,3 +2777,248 @@ input:checked + .slider:before {
     gap: 4px;
     min-height: 48px;
 }
+
+/* =====================================================
+   OMNI-SEARCH COMMAND PALETTE
+   ===================================================== */
+#modal-search {
+    max-width: 960px;
+    background: #090e1a;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95), 0 0 40px rgba(56, 189, 248, 0.25);
+}
+
+.omni-search-header {
+    padding: 1.2rem 1.6rem 0.8rem 1.6rem;
+    background: #0d1527;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.omni-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(3, 7, 18, 0.85);
+    border: 1.5px solid rgba(56, 189, 248, 0.35);
+    border-radius: 14px;
+    padding: 0.6rem 1rem;
+    gap: 0.75rem;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.omni-input-wrapper:focus-within {
+    border-color: var(--secondary);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.35), inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.omni-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.omni-search-input::placeholder {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.omni-kbd-hint {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.omni-clear-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: var(--text-muted);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.omni-clear-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.omni-chips-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.75rem 1.6rem;
+    background: rgba(13, 21, 39, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.omni-chips-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.omni-chip {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.omni-chip:hover {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.3);
+    color: #fff;
+}
+.omni-chip.active {
+    background: rgba(56, 189, 248, 0.25);
+    border-color: var(--secondary);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.omni-results-stats {
+    padding: 0.5rem 1.6rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.omni-results-container {
+    padding: 1rem 1.6rem;
+    overflow-y: auto;
+    max-height: 58vh;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: #090e1a;
+}
+
+.omni-result-item {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.omni-result-item:hover, .omni-result-item.selected {
+    transform: translateX(3px);
+    background: rgba(15, 23, 42, 0.95);
+    border-color: var(--secondary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.omni-result-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.omni-result-badge {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.omni-badge-penal { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+.omni-badge-traffic { background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+.omni-badge-radio { background: rgba(96, 165, 250, 0.18); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.35); }
+.omni-badge-bodycam { background: rgba(244, 63, 94, 0.18); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35); }
+.omni-badge-rp { background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); }
+.omni-badge-parking { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+.omni-badge-prohibited { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+.omni-badge-dress { background: rgba(251, 146, 60, 0.18); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.35); }
+
+.omni-result-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--text-main);
+    flex: 1;
+}
+
+.omni-result-title mark, .omni-snippet mark {
+    background: rgba(245, 158, 11, 0.4);
+    color: #fff;
+    padding: 0 3px;
+    border-radius: 3px;
+}
+
+.omni-result-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.omni-snippet {
+    background: rgba(3, 7, 18, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.84rem;
+    color: #38bdf8;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.omni-result-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+}
+
+.omni-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+.omni-empty-state .material-symbols-outlined {
+    font-size: 3rem;
+    color: rgba(56, 189, 248, 0.35);
+    margin-bottom: 0.8rem;
+}
+

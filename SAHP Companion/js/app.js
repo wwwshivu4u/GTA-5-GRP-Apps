@@ -1858,15 +1858,13 @@ function updateModalStackLayers() {
             el.classList.remove('modal-stacked-active');
             el.classList.add('modal-stacked-behind');
 
-            const translateY = -18 * depth;
-            const scale = Math.max(0.86, 1 - depth * 0.038);
-            const opacity = Math.max(0.42, 0.88 - depth * 0.14);
-            const blur = Math.min(2.5, depth * 0.7);
+            const translateY = -22 * depth;
+            const scale = Math.max(0.88, 1 - depth * 0.035);
 
             el.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
-            el.style.opacity = opacity.toString();
-            el.style.filter = `blur(${blur}px) brightness(${Math.max(0.75, 0.92 - depth * 0.05)})`;
-            el.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.8)';
+            el.style.opacity = '1';
+            el.style.filter = `brightness(${Math.max(0.65, 0.85 - depth * 0.1)})`;
+            el.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.9)';
         }
     });
 }
@@ -2226,8 +2224,540 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// =====================================================
+// 17. TACTICAL OMNI-SEARCH ENGINE (GLOBAL ACROSS ALL CONTENT)
+// =====================================================
+let omniSearchIndex = null;
+let currentOmniFilter = 'ALL';
+let currentOmniSelectedIndex = -1;
+let omniDebounceTimer = null;
+
+function escapeHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function escapeQuote(str) {
+    return String(str || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '&quot;')
+        .replace(/\n/g, ' ');
+}
+
+function highlightMatch(text, query) {
+    if (!query || !text) return escapeHtml(text || '');
+    const terms = query.trim().split(/\s+/).filter(t => t.length > 0);
+    if (terms.length === 0) return escapeHtml(text);
+    const escapedTerms = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const regex = new RegExp(`(${escapedTerms.join('|')})`, 'gi');
+    return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+}
+
+function buildOmniSearchIndex() {
+    omniSearchIndex = [];
+
+    // 1. Penal Codes
+    if (window.SAHP_DATA && Array.isArray(window.SAHP_DATA.penalCodes)) {
+        window.SAHP_DATA.penalCodes.forEach(p => {
+            omniSearchIndex.push({
+                id: 'penal-' + p.code,
+                category: 'PENAL',
+                badgeClass: 'omni-badge-penal',
+                badgeIcon: 'gavel',
+                badgeText: 'Penal Code',
+                title: `${p.code} - ${p.title}`,
+                meta: `${p.category || 'Penal'} • Fine: ${p.fine} • Sentence: ${p.sentence || 'None'} • Class: ${p.class || 'N/A'}`,
+                snippet: `${p.code} ${p.title} ${p.fine !== '-' ? '| Fine: ' + p.fine : ''} ${p.sentence !== '-' ? '| Sentence: ' + p.sentence : ''}`,
+                copyText: `${p.code} - ${p.title} (${p.fine})`,
+                searchStr: `${p.code} ${p.title} ${p.category || ''} ${p.fine || ''} ${p.sentence || ''} ${p.class || ''} ${p.remarks || ''}`.toLowerCase(),
+                targetModal: 'modal-penal',
+                targetTab: 'penal',
+                targetCode: p.code
+            });
+        });
+    }
+
+    // 2. Traffic Codes
+    if (window.SAHP_DATA && Array.isArray(window.SAHP_DATA.trafficCodes)) {
+        window.SAHP_DATA.trafficCodes.forEach(t => {
+            omniSearchIndex.push({
+                id: 'traffic-' + t.code,
+                category: 'TRAFFIC',
+                badgeClass: 'omni-badge-traffic',
+                badgeIcon: 'traffic',
+                badgeText: 'Traffic Code',
+                title: `${t.code} - ${t.title}`,
+                meta: `${t.category || 'Traffic'} • Fine: ${t.fine} • Points: ${t.points || '0'} • Impound Fee: ${t.impoundFee ? '$' + t.impoundFee.toLocaleString() : 'N/A'}`,
+                snippet: `${t.code} ${t.title} | Fine: ${t.fine} | Points: ${t.points || 0}`,
+                copyText: `${t.code} - ${t.title} (${t.fine})`,
+                searchStr: `${t.code} ${t.title} ${t.category || ''} ${t.fine || ''} ${t.points || ''} ${t.remarks || ''}`.toLowerCase(),
+                targetModal: 'modal-penal',
+                targetTab: 'traffic',
+                targetCode: t.code
+            });
+        });
+    }
+
+    // 3. Article 7 Parking Regulations
+    if (window.SAHP_DATA && Array.isArray(window.SAHP_DATA.article7)) {
+        window.SAHP_DATA.article7.forEach((a, i) => {
+            omniSearchIndex.push({
+                id: 'parking-' + i,
+                category: 'PARKING',
+                badgeClass: 'omni-badge-parking',
+                badgeIcon: 'local_parking',
+                badgeText: 'Article 7 Parking',
+                title: a.title,
+                meta: `State of San Andreas Parking Code • ${a.subtitle || 'Article 7'}`,
+                snippet: a.rule || a.desc || a.title,
+                copyText: `${a.title}: ${a.rule || a.desc || ''}`,
+                searchStr: `${a.title} ${a.subtitle || ''} ${a.rule || ''} ${a.desc || ''} parking towing yellow red zone`.toLowerCase(),
+                targetModal: 'modal-article7',
+                targetTab: null,
+                targetCode: null
+            });
+        });
+    }
+
+    // 4. Prohibited Items (§2.4)
+    if (window.SAHP_DATA && Array.isArray(window.SAHP_DATA.prohibitedItems)) {
+        window.SAHP_DATA.prohibitedItems.forEach((item, i) => {
+            omniSearchIndex.push({
+                id: 'prohibited-' + i,
+                category: 'PARKING',
+                badgeClass: 'omni-badge-prohibited',
+                badgeIcon: 'do_not_disturb_on',
+                badgeText: 'Prohibited §2.4',
+                title: item.name || item.title,
+                meta: `Contraband Classification: ${item.category || 'Illegal'} • Confiscation: ${item.confiscation ? 'YES' : 'NO'}`,
+                snippet: `${item.name} (${item.category || 'Contraband'}) - Fine: ${item.fine || 'Confiscation'}`,
+                copyText: `§2.4 Prohibited Item: ${item.name} (${item.category || ''})`,
+                searchStr: `${item.name} ${item.category || ''} ${item.legalStatus || ''} ${item.fine || ''} prohibited contraband`.toLowerCase(),
+                targetModal: 'modal-prohibited',
+                targetTab: null,
+                targetCode: null
+            });
+        });
+    }
+
+    // 5. Radio & 10-Codes (Quick Codes + Directory)
+    document.querySelectorAll('#modal-radio .quick-codes-grid .quick-code-btn').forEach((btn, i) => {
+        const code = btn.querySelector('span:first-child')?.textContent?.trim() || '';
+        const sub = btn.querySelector('.code-sub')?.textContent?.trim() || '';
+        const clickAttr = btn.getAttribute('onclick') || '';
+        const match = clickAttr.match(/copySimple\(['"]([^'"]+)['"]\)/);
+        const copyStr = match ? match[1] : `${code} ${sub}`;
+        if (code) {
+            omniSearchIndex.push({
+                id: 'radio-qc-' + i,
+                category: 'RADIO',
+                badgeClass: 'omni-badge-radio',
+                badgeIcon: 'podcasts',
+                badgeText: '10-Code Quick',
+                title: `${code} - ${sub}`,
+                meta: `Radio Quick Transmission Code`,
+                snippet: copyStr,
+                copyText: copyStr,
+                searchStr: `${code} ${sub} ${copyStr} 10-code radio comms`.toLowerCase(),
+                targetModal: 'modal-radio',
+                targetTab: 'tab-rc-10codes',
+                targetCode: code
+            });
+        }
+    });
+
+    document.querySelectorAll('#tab-rc-10codes .rc-table-row').forEach((row, i) => {
+        const code = row.querySelector('.rc-code-badge')?.textContent?.trim() || '';
+        const desc = row.querySelector('.rc-code-desc')?.textContent?.trim() || '';
+        const clickAttr = row.querySelector('button')?.getAttribute('onclick') || '';
+        const match = clickAttr.match(/copySimple\(['"]([^'"]+)['"]\)/);
+        const copyStr = match ? match[1] : `${code} ${desc}`;
+        if (code) {
+            omniSearchIndex.push({
+                id: 'radio-dir-' + i,
+                category: 'RADIO',
+                badgeClass: 'omni-badge-radio',
+                badgeIcon: 'podcasts',
+                badgeText: 'Radio Directory',
+                title: `${code}: ${desc}`,
+                meta: `Official Radio Protocol • 10-Codes Directory`,
+                snippet: copyStr,
+                copyText: copyStr,
+                searchStr: `${code} ${desc} ${copyStr} radio 10-code`.toLowerCase(),
+                targetModal: 'modal-radio',
+                targetTab: 'tab-rc-10codes',
+                targetCode: code
+            });
+        }
+    });
+
+    // 6. Department Radio Broadcast Calls
+    document.querySelectorAll('#modal-radio .dept-tab-content .copy-block').forEach((block, i) => {
+        const header = block.querySelector('.copy-header span')?.textContent?.trim() || 'Radio Call';
+        const content = block.querySelector('.copy-content')?.textContent?.trim() || '';
+        if (content) {
+            omniSearchIndex.push({
+                id: 'radio-dept-' + i,
+                category: 'RADIO',
+                badgeClass: 'omni-badge-radio',
+                badgeIcon: 'campaign',
+                badgeText: 'Dept Radio Call',
+                title: header,
+                meta: `Inter-Agency & Tactical Radio Protocol`,
+                snippet: content,
+                copyText: content,
+                searchStr: `${header} ${content} radio call broadcast`.toLowerCase(),
+                targetModal: 'modal-radio',
+                targetTab: 'tab-rc-dept',
+                targetCode: null
+            });
+        }
+    });
+
+    // 7. Bodycam Protocols
+    document.querySelectorAll('#modal-bodycam .tab-content').forEach(tab => {
+        const tabId = tab.id;
+        const tabBtn = document.querySelector(`button[onclick*="${tabId}"]`);
+        const tabName = tabBtn?.textContent?.trim() || 'Protocol';
+        tab.querySelectorAll('.copy-block').forEach((block, i) => {
+            const title = block.querySelector('.copy-header span')?.textContent?.trim() || `Step ${i + 1}`;
+            const content = block.querySelector('.copy-content')?.textContent?.trim() || '';
+            if (content) {
+                omniSearchIndex.push({
+                    id: 'bodycam-' + tabId + '-' + i,
+                    category: 'BODYCAM',
+                    badgeClass: 'omni-badge-bodycam',
+                    badgeIcon: 'videocam',
+                    badgeText: 'Bodycam ' + tabName,
+                    title: `${title} (${tabName})`,
+                    meta: `Bodycam Sequence • ${tabName} Protocol`,
+                    snippet: content,
+                    copyText: content,
+                    searchStr: `${title} ${tabName} ${content} bodycam protocol /me /do`.toLowerCase(),
+                    targetModal: 'modal-bodycam',
+                    targetTab: tabId,
+                    targetCode: null
+                });
+            }
+        });
+    });
+
+    // 8. Roleplay Commands (/me, /do, /try, /todo)
+    document.querySelectorAll('#modal-roleplay .tab-content').forEach(tab => {
+        const tabId = tab.id;
+        const tabBtn = document.querySelector(`button[onclick*="${tabId}"]`);
+        const tabName = tabBtn?.textContent?.trim() || 'Roleplay';
+        tab.querySelectorAll('.rp-command-block, .copy-block').forEach((block, i) => {
+            const header = block.querySelector('.rp-command-header, .copy-header')?.textContent?.trim() || '';
+            const text = block.querySelector('.rp-command-text, .copy-content')?.textContent?.trim() || '';
+            if (text) {
+                omniSearchIndex.push({
+                    id: 'rp-' + tabId + '-' + i,
+                    category: 'ROLEPLAY',
+                    badgeClass: 'omni-badge-rp',
+                    badgeIcon: 'psychology',
+                    badgeText: 'Roleplay ' + tabName,
+                    title: `${header || 'RP Command'} (${tabName})`,
+                    meta: `Roleplay Protocol • ${tabName}`,
+                    snippet: text,
+                    copyText: text,
+                    searchStr: `${header} ${tabName} ${text} roleplay /me /do /try /todo sop`.toLowerCase(),
+                    targetModal: 'modal-roleplay',
+                    targetTab: tabId,
+                    targetCode: null
+                });
+            }
+        });
+    });
+
+    // 9. Uniforms & Dresscodes
+    document.querySelectorAll('#modal-dresscodes .dresscode-card').forEach((card, i) => {
+        const rank = card.querySelector('.dresscode-rank-title')?.textContent?.trim() || '';
+        const tier = card.querySelector('.dresscode-tier-badge')?.textContent?.trim() || '';
+        const items = Array.from(card.querySelectorAll('.dresscode-item-cell')).map(c => {
+            const lbl = c.querySelector('.dresscode-item-lbl')?.textContent?.trim() || '';
+            const val = c.querySelector('.dresscode-item-val')?.textContent?.trim() || '';
+            return `${lbl}: ${val}`;
+        }).join(' | ');
+        if (rank) {
+            omniSearchIndex.push({
+                id: 'dress-' + i,
+                category: 'DRESS',
+                badgeClass: 'omni-badge-dress',
+                badgeIcon: 'apparel',
+                badgeText: 'Uniform Dresscode',
+                title: rank,
+                meta: `${tier} • Standard Issue Clothing Numbers`,
+                snippet: items || rank,
+                copyText: `${rank} Uniform - ${items}`,
+                searchStr: `${rank} ${tier} ${items} dresscode uniform clothing`.toLowerCase(),
+                targetModal: 'modal-dresscodes',
+                targetTab: null,
+                targetCode: null
+            });
+        }
+    });
+}
+
+function executeOmniSearch(query) {
+    if (!omniSearchIndex) buildOmniSearchIndex();
+
+    const q = (query || '').toLowerCase().trim();
+    const clearBtn = document.getElementById('omni-clear-btn');
+    if (clearBtn) {
+        clearBtn.style.display = q ? 'flex' : 'none';
+    }
+
+    const countEl = document.getElementById('omni-results-count');
+    const container = document.getElementById('omni-search-results');
+    if (!container) return;
+
+    if (!q) {
+        // Show recommended tactical quick shortcuts
+        const shortcuts = omniSearchIndex.filter(item => 
+            currentOmniFilter === 'ALL' || item.category === currentOmniFilter
+        ).slice(0, 24);
+
+        if (countEl) {
+            countEl.textContent = `Tactical Quick Shortcuts (${omniSearchIndex.length} Total Records Indexed)`;
+        }
+        renderOmniSearchResults(shortcuts, '');
+        return;
+    }
+
+    const terms = q.split(/\s+/).filter(t => t.length > 0);
+
+    let matches = omniSearchIndex.filter(item => {
+        if (currentOmniFilter !== 'ALL' && item.category !== currentOmniFilter) {
+            return false;
+        }
+        return terms.every(term => item.searchStr.includes(term));
+    });
+
+    matches.sort((a, b) => {
+        const aTitle = a.title.toLowerCase();
+        const bTitle = b.title.toLowerCase();
+        const aStarts = aTitle.startsWith(q);
+        const bStarts = bTitle.startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return aTitle.indexOf(q) - bTitle.indexOf(q);
+    });
+
+    const displayMatches = matches.slice(0, 50);
+
+    if (countEl) {
+        countEl.textContent = `Found ${matches.length} matching items`;
+    }
+
+    renderOmniSearchResults(displayMatches, query);
+}
+
+function renderOmniSearchResults(results, query) {
+    const container = document.getElementById('omni-search-results');
+    if (!container) return;
+
+    if (results.length === 0) {
+        container.innerHTML = `
+            <div class="omni-empty-state">
+                <span class="material-symbols-outlined">search_off</span>
+                <div style="font-size:1.1rem; font-weight:700; color:var(--text-main); margin-bottom:0.3rem;">No Records Found</div>
+                <div style="font-size:0.85rem;">Try a different keyword or code (e.g., <code>10-4</code>, <code>speeding</code>, <code>bodycam</code>, <code>/me</code>, <code>parking</code>, <code>cocaine</code>).</div>
+            </div>
+        `;
+        currentOmniSelectedIndex = -1;
+        return;
+    }
+
+    let html = '';
+    results.forEach((item, index) => {
+        const highlightedTitle = highlightMatch(item.title, query);
+        const highlightedSnippet = highlightMatch(item.snippet, query);
+        const selectedClass = index === currentOmniSelectedIndex ? 'selected' : '';
+
+        html += `
+            <div class="omni-result-item ${selectedClass}" data-index="${index}" onclick="jumpToOmniTarget('${item.targetModal}', '${item.targetTab || ''}', '${item.targetCode || ''}')">
+                <div class="omni-result-top">
+                    <span class="omni-result-badge ${item.badgeClass}">
+                        <span class="material-symbols-outlined" style="font-size:0.9rem;">${item.badgeIcon}</span>
+                        ${item.badgeText}
+                    </span>
+                    <span class="omni-result-title">${highlightedTitle}</span>
+                </div>
+                <div class="omni-result-meta">${escapeHtml(item.meta)}</div>
+                <div class="omni-snippet">${highlightedSnippet}</div>
+                <div class="omni-result-actions" onclick="event.stopPropagation()">
+                    <button class="btn btn-secondary btn-sm omni-copy-btn" onclick="copySimple('${escapeQuote(item.copyText)}'); event.stopPropagation();">
+                        <span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="jumpToOmniTarget('${item.targetModal}', '${item.targetTab || ''}', '${item.targetCode || ''}'); event.stopPropagation();">
+                        <span class="material-symbols-outlined" style="font-size:0.95rem;">launch</span> Jump to Section
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function updateOmniSelection(results) {
+    results.forEach((el, i) => {
+        if (i === currentOmniSelectedIndex) {
+            el.classList.add('selected');
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        } else {
+            el.classList.remove('selected');
+        }
+    });
+}
+
+function setOmniCategoryFilter(cat) {
+    currentOmniFilter = cat;
+    document.querySelectorAll('.omni-chip').forEach(btn => {
+        if (btn.getAttribute('data-omni-cat') === cat) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    const input = document.getElementById('omni-search-input');
+    executeOmniSearch(input ? input.value : '');
+}
+
+function clearOmniSearch() {
+    const input = document.getElementById('omni-search-input');
+    if (input) {
+        input.value = '';
+        input.focus();
+    }
+    executeOmniSearch('');
+}
+
+function openOmniSearch() {
+    openModal('modal-search');
+    if (!omniSearchIndex) {
+        buildOmniSearchIndex();
+    }
+    const input = document.getElementById('omni-search-input');
+    if (input) {
+        setTimeout(() => {
+            input.focus();
+            input.select();
+        }, 60);
+    }
+    executeOmniSearch(input ? input.value : '');
+}
+
+function jumpToOmniTarget(targetModal, targetTab, targetCode) {
+    closeModals('modal-search');
+    setTimeout(() => {
+        openModal(targetModal);
+        if (targetModal === 'modal-penal') {
+            if (targetTab === 'traffic') {
+                if (window.app && window.app.switchLegalEngineTab) {
+                    window.app.switchLegalEngineTab('traffic');
+                }
+                if (targetCode) {
+                    const input = document.getElementById('traffic-search-input');
+                    if (input) {
+                        input.value = targetCode;
+                        input.dispatchEvent(new Event('input'));
+                    }
+                }
+            } else {
+                if (window.app && window.app.switchLegalEngineTab) {
+                    window.app.switchLegalEngineTab('penal');
+                }
+                if (targetCode) {
+                    const input = document.getElementById('penal-search-input');
+                    if (input) {
+                        input.value = targetCode;
+                        input.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+        } else if (targetModal === 'modal-bodycam' && targetTab) {
+            const btn = document.querySelector(`button[onclick*="${targetTab}"]`);
+            if (btn) switchTab(btn, targetTab);
+        } else if (targetModal === 'modal-roleplay' && targetTab) {
+            const btn = document.querySelector(`button[onclick*="${targetTab}"]`);
+            if (btn) switchTab(btn, targetTab);
+        } else if (targetModal === 'modal-radio' && targetTab) {
+            switchRadioTab(targetTab);
+        }
+    }, 150);
+}
+
+function initOmniSearch() {
+    const input = document.getElementById('omni-search-input');
+    if (!input) return;
+
+    input.addEventListener('input', (e) => {
+        if (omniDebounceTimer) clearTimeout(omniDebounceTimer);
+        omniDebounceTimer = setTimeout(() => {
+            currentOmniSelectedIndex = -1;
+            executeOmniSearch(e.target.value);
+        }, 50);
+    });
+
+    input.addEventListener('keydown', (e) => {
+        const results = document.querySelectorAll('.omni-result-item');
+        if (results.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentOmniSelectedIndex = (currentOmniSelectedIndex + 1) % results.length;
+            updateOmniSelection(results);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentOmniSelectedIndex = (currentOmniSelectedIndex - 1 + results.length) % results.length;
+            updateOmniSelection(results);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentOmniSelectedIndex >= 0 && currentOmniSelectedIndex < results.length) {
+                const targetItem = results[currentOmniSelectedIndex];
+                const copyBtn = targetItem.querySelector('.omni-copy-btn');
+                if (copyBtn) copyBtn.click();
+            } else if (results.length > 0) {
+                const copyBtn = results[0].querySelector('.omni-copy-btn');
+                if (copyBtn) copyBtn.click();
+            }
+        }
+    });
+}
+
+// Global Keyboard Shortcuts: Ctrl+K / Cmd+K or / to open Omni Search
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openOmniSearch();
+        return;
+    }
+    if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && !document.activeElement.isContentEditable) {
+        const searchModal = document.getElementById('modal-search');
+        if (!searchModal || !searchModal.classList.contains('active')) {
+            e.preventDefault();
+            openOmniSearch();
+            return;
+        }
+    }
+});
+
+// Expose globals for onclick attributes
+window.openOmniSearch = openOmniSearch;
+window.clearOmniSearch = clearOmniSearch;
+window.setOmniCategoryFilter = setOmniCategoryFilter;
+window.jumpToOmniTarget = jumpToOmniTarget;
+
 // Backdrop click listeners to close modal when clicking outside
 document.addEventListener('DOMContentLoaded', () => {
+    initOmniSearch();
+
     const overlay = document.getElementById('modalOverlay');
     if (overlay) {
         overlay.addEventListener('click', (e) => {

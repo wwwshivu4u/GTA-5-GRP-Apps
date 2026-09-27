@@ -20,6 +20,8 @@ graph TD;
     Companion -->|Generates Formatted Logs| Discord[Discord Channels]
     Discord -->|Ingested & Parsed| HRMS[EMS HRMS]
     HRMS -->|Calculates Payouts & Bonuses| Leaderboard[Payroll & Leaderboards]
+    Patrol[SAHP Patrol Duties] -->|Penal & Traffic Codes, Comms, Timers| SAHP[SAHP Companion]
+    SAHP -->|Generates Radio Comms & Arrest Logs| Discord
 ```
 
 1. **[EMS Companion](EMS%20Companion/)** 🩺 — In-game dashboard with Dynamic Island shift timer, quick logs, radio codes, and an Android Auto-style split layout (`https://ems-companion-gtav-grp.web.app`).
@@ -107,6 +109,51 @@ The **EMS Shift Guide** is a focused reference and time-tracking utility for ind
 
 ---
 
+## 4. 🚔 SAHP Companion
+
+The **SAHP Companion** is a dedicated, mission-critical Mobile Data Terminal (MDT) and tactical field companion engineered for the San Andreas Highway Patrol in Grand RP. It provides rapid legal code calculations, radio status automation, bodycam compliance tracking, and a floating tactical dock.
+
+🔗 **Live Deployment**: [`https://sahp-companion-gtav-grp.web.app`](https://sahp-companion-gtav-grp.web.app)  
+📖 **Dedicated Documentation**: [`SAHP Companion/README.md`](SAHP%20Companion/README.md)
+
+### ✨ Key Features
+
+- **Smart Duty Automation**:
+  - One-click clipboard copy of standard SAHP radio status commands:
+    - **10-8 On Duty**: Copies `10-8 {Duty Name} {Current IC Time}`.
+    - **10-9 Off Duty**: Copies `10-9 {Duty Name} {Current IC Time}`.
+  - Automatic validation preventing on-duty activation without Badge ID and Division/Unit selection.
+- **2-in-1 Unified Legal & Traffic Code Engine**:
+  - Combined interactive database for **Penal Codes** and **Traffic Code**.
+  - Instant live fuzzy search by article, violation title, offense category, or keyword.
+  - Multi-select charge calculator dynamically computing:
+    - Total fine accumulation ($).
+    - Incarceration star rating (★).
+    - Driver's license suspension / confiscation flags.
+    - Mandatory vehicle impound requirements.
+  - One-click generation and clipboard copy of formatted arrest/citation Discord logs.
+- **Progressive Bodycam Verification SOP**:
+  - Interactive multi-step verification protocol ensuring roleplay compliance and court-admissible bodycam footage.
+  - Real-time progress bar tracking activation steps with reset and auto-save capabilities.
+- **Departmental Comms & 10-Codes Reference**:
+  - Official SAHP radio codes, 10-codes, 11-codes, and tactical signal standards.
+  - Instant search and single-click clipboard copying for fast radio discipline.
+- **Roleplay SOPs & Miranda Rights**:
+  - Standard verbatim Miranda warning card for suspect apprehension.
+  - Clear guidelines on stop-and-frisk criteria, traffic stops, and vehicle search authorities.
+- **25-Minute Custody Processing Timer**:
+  - Audio and visual countdown ensuring compliance with Grand RP holding limits.
+  - Visual status badges: Green (Active) $\rightarrow$ Amber (Warning < 5m) $\rightarrow$ Red (Expired / Overdue).
+- **Tactical Field Notepad**:
+  - Auto-saving local storage scratchpad with character counters and timestamp insertion.
+- **Multi-Window 3D Layered Stacking**:
+  - Nested tool modals under the "More" tile open into a layered multi-window desktop with z-index elevation, backdrop shading, and hierarchical outward-in click dismissal.
+- **Universal Tactical Omni-Search (`Ctrl+K` / `/`)**:
+  - Global Command Palette accessible from anywhere on the screen or via keyboard shortcuts.
+  - Instant unified search across bodycams, radio codes, penal articles, traffic fines, and roleplay procedures.
+
+---
+
 ## 🛠️ Technology Stack
 
 | Component | Technologies Used |
@@ -135,9 +182,11 @@ python -m http.server 8081 --directory "EMS HRMS"
 # Serve EMS Shift Guide
 python -m http.server 8082 --directory "EMS Shift Guide"
 
+# Serve SAHP Companion
+python -m http.server 8083 --directory "SAHP Companion"
 ```
 
-Open your browser at `http://localhost:8080`.
+Open your browser at `http://localhost:8080` (or `http://localhost:8083` for SAHP Companion).
 
 ### Firebase Deployment
 The repository is pre-configured with multi-target hosting in [`firebase.json`](firebase.json):
@@ -155,6 +204,8 @@ firebase deploy --only hosting:hrms
 # Deploy only EMS Shift Guide (https://ems-shift-guide-gtav-grp.web.app)
 firebase deploy --only hosting:shift
 
+# Deploy only SAHP Companion (https://sahp-companion-gtav-grp.web.app)
+firebase deploy --only hosting:sahp-companion
 ```
 
 ---

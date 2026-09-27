@@ -2009,10 +2009,73 @@ Do you understand the rights I just read to you?"
                 </div>
             </div>
 
+            <!-- MODAL 12: TACTICAL OMNI-SEARCH COMMAND PALETTE -->
+            <div class="modal-content" id="modal-search" style="max-width: 960px;">
+                <div class="omni-search-header">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.8rem;">
+                        <span style="display: flex; align-items: center; font-size:1.05rem; font-weight:700; color:var(--text-main);">
+                            <span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.35rem; margin-right:8px;">saved_search</span>
+                            Tactical Omni-Search Command Palette
+                        </span>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="omni-kbd-hint"><kbd>ESC</kbd> to exit</span>
+                            <button class="close-btn" onclick="closeModals('modal-search')"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                        </div>
+                    </div>
+                    <div class="omni-input-wrapper">
+                        <span class="material-symbols-outlined" style="color:var(--secondary); font-size:1.35rem;">search</span>
+                        <input type="text" id="omni-search-input" class="omni-search-input" placeholder="Search penal codes, 10-codes, bodycam, /me commands, traffic, parking, dress codes..." autocomplete="off" spellcheck="false">
+                        <button class="omni-clear-btn" id="omni-clear-btn" onclick="clearOmniSearch()" title="Clear search query" style="display:none;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="omni-chips-bar" id="omni-chips-bar">
+                    <button class="omni-chip active" data-omni-cat="ALL" onclick="setOmniCategoryFilter('ALL')">
+                        <span class="material-symbols-outlined" style="font-size:0.95rem;">apps</span> All
+                    </button>
+                    <button class="omni-chip" data-omni-cat="PENAL" onclick="setOmniCategoryFilter('PENAL')">
+                        <span class="material-symbols-outlined icon-gradient-gold" style="font-size:0.95rem;">gavel</span> Penal
+                    </button>
+                    <button class="omni-chip" data-omni-cat="TRAFFIC" onclick="setOmniCategoryFilter('TRAFFIC')">
+                        <span class="material-symbols-outlined icon-gradient-blue" style="font-size:0.95rem;">traffic</span> Traffic
+                    </button>
+                    <button class="omni-chip" data-omni-cat="RADIO" onclick="setOmniCategoryFilter('RADIO')">
+                        <span class="material-symbols-outlined" style="font-size:0.95rem; color:#60a5fa;">podcasts</span> 10-Codes
+                    </button>
+                    <button class="omni-chip" data-omni-cat="BODYCAM" onclick="setOmniCategoryFilter('BODYCAM')">
+                        <span class="material-symbols-outlined icon-gradient-rose" style="font-size:0.95rem;">videocam</span> Bodycam
+                    </button>
+                    <button class="omni-chip" data-omni-cat="ROLEPLAY" onclick="setOmniCategoryFilter('ROLEPLAY')">
+                        <span class="material-symbols-outlined icon-gradient-purple" style="font-size:0.95rem;">psychology</span> Roleplay
+                    </button>
+                    <button class="omni-chip" data-omni-cat="PARKING" onclick="setOmniCategoryFilter('PARKING')">
+                        <span class="material-symbols-outlined icon-gradient-emerald" style="font-size:0.95rem;">local_parking</span> Regulations
+                    </button>
+                    <button class="omni-chip" data-omni-cat="DRESS" onclick="setOmniCategoryFilter('DRESS')">
+                        <span class="material-symbols-outlined" style="font-size:0.95rem; color:#fb923c;">apparel</span> Uniforms
+                    </button>
+                </div>
+
+                <div class="omni-results-stats">
+                    <span id="omni-results-count">Type query to search</span>
+                    <span style="font-size:0.7rem; color:var(--secondary); text-transform:none;">Instant Live Search</span>
+                </div>
+
+                <div class="omni-results-container" id="omni-search-results">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
         </div> <!-- End of modalOverlay -->
 
         <!-- CONSOLIDATED TACTICAL FLOATING DOCK -->
         <div class="tactical-dock" id="tactical-dock">
+            <button class="dock-btn dock-search-btn" id="dock-search-btn" onclick="openOmniSearch()" title="Tactical Omni-Search (Ctrl+K)" aria-label="Universal Search">
+                <span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.35rem;">search</span>
+                <span class="dock-tooltip">Omni Search</span>
+            </button>
             <button class="dock-btn" onclick="openModal('modal-notes')" title="Quick Field Notepad" aria-label="Quick Notepad">
                 <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
                 <span class="dock-tooltip">Notepad</span>
