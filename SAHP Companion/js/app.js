@@ -66,6 +66,18 @@
     const LEGACY_STORAGE_KEY = 'lspd_companion_state_v1';
     const DEFAULTS_STORAGE_KEY = 'sahp_companion_user_defaults_v1';
 
+    const BOTTOM_NAV_SERVICES = [
+        { id: 'penal', icon: '<span class="material-symbols-outlined icon-gradient-gold">gavel</span>', text: 'PENAL<br>CODES', smallText: 'PENAL<br>CODES', modal: 'modal-penal' },
+        { id: 'arrest', icon: '<span class="material-symbols-outlined icon-gradient-rose">timer</span>', text: 'ARREST<br>ENGINE', smallText: 'ARREST<br>ENGINE', modal: 'modal-arrest' },
+        { id: 'traffic', icon: '<span class="material-symbols-outlined icon-gradient-cyan">directions_car</span>', text: 'TRAFFIC<br>CODES', smallText: 'TRAFFIC<br>CODES', modal: 'modal-traffic' },
+        { id: 'dresscodes', icon: '<span class="material-symbols-outlined icon-gradient-purple">checkroom</span>', text: 'DRESS<br>CODES', smallText: 'DRESS<br>CODES', modal: 'modal-dresscodes' },
+        { id: 'rp', icon: '<span class="material-symbols-outlined icon-gradient-emerald">psychology</span>', text: 'ROLEPLAY<br>&amp; SOPS', smallText: 'ROLEPLAY<br>&amp; SOPS', modal: 'modal-roleplay' },
+        { id: 'article7', icon: '<span class="material-symbols-outlined icon-gradient-amber">local_parking</span>', text: 'ARTICLE 7<br>PARKING', smallText: 'ARTICLE 7<br>PARKING', modal: 'modal-article7' },
+        { id: 'prohibited', icon: '<span class="material-symbols-outlined icon-gradient-rose">block</span>', text: 'PROHIBITED<br>ITEMS', smallText: 'PROHIBITED<br>ITEMS', modal: 'modal-prohibited' },
+        { id: 'notes', icon: '<span class="material-symbols-outlined icon-gradient-amber">edit_note</span>', text: 'FIELD<br>NOTEPAD', smallText: 'FIELD<br>NOTEPAD', modal: 'modal-notes' },
+        { id: 'settings', icon: '<span class="material-symbols-outlined icon-gradient-slate">settings</span>', text: 'SETTINGS<br>&amp; CONFIG', smallText: 'SETTINGS', modal: 'modal-settings' }
+    ];
+
     class StateManager {
         constructor() {
             this.state = this.getDefaultState();
@@ -90,6 +102,7 @@
                 selectedLocation: 'Patrol (Highway / Paleto)',
                 quickNotes: '',
                 selectedCharges: [],
+                selectedTrafficCharges: [],
                 arrestsLogged: 0,
                 towsLogged: 0,
                 customCommands: {},
@@ -154,6 +167,91 @@
 
     const stateManager = new StateManager();
     let state = stateManager.load();
+
+    // -----------------------------------------------------
+    // 2B. BOTTOM NAVIGATION CONTROLLER (EMS Companion Pattern)
+    // -----------------------------------------------------
+    function renderBottomNav() {
+        const currentMainId = stateManager.get('mainNavService') || 'penal';
+        const mainService = BOTTOM_NAV_SERVICES.find(s => s.id === currentMainId) || BOTTOM_NAV_SERVICES[0];
+
+        const mainIcon = document.getElementById('main-icon');
+        const mainText = document.getElementById('main-text');
+        const mainCard = document.getElementById('main-service-card');
+
+        if (mainIcon) mainIcon.innerHTML = mainService.icon;
+        if (mainText) mainText.innerHTML = mainService.text;
+        if (mainCard) {
+            mainCard.onclick = (e) => {
+                if (e.target.closest('.nav-dropdown-btn') || e.target.closest('.nav-dropdown-menu')) return;
+                openModal(mainService.modal);
+            };
+        }
+
+        const dropdown = document.getElementById('service-dropdown');
+        if (dropdown) {
+            dropdown.innerHTML = '';
+            BOTTOM_NAV_SERVICES.forEach(s => {
+                if (s.id !== currentMainId) {
+                    const item = document.createElement('div');
+                    item.className = 'nav-dropdown-item';
+                    item.innerHTML = `<span>${s.icon}</span> <span>${s.text.replace(/<br>/g, ' ')}</span>`;
+                    item.onclick = (e) => {
+                        e.stopPropagation();
+                        stateManager.set('mainNavService', s.id);
+                        dropdown.classList.remove('active');
+                        renderBottomNav();
+                        if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+                            window.soundSystem.playRadioClick();
+                        }
+                    };
+                    dropdown.appendChild(item);
+                }
+            });
+        }
+
+        const secondaryGrid = document.getElementById('secondary-grid');
+        if (secondaryGrid) {
+            secondaryGrid.innerHTML = '';
+            const otherServices = BOTTOM_NAV_SERVICES.filter(s => s.id !== currentMainId);
+            let gridItems;
+            if (currentMainId === 'settings') {
+                gridItems = otherServices.slice(0, 4);
+            } else {
+                const nonSettings = otherServices.filter(s => s.id !== 'settings');
+                const settingsItem = BOTTOM_NAV_SERVICES.find(s => s.id === 'settings') || {
+                    id: 'settings',
+                    icon: '<span class="material-symbols-outlined icon-gradient-slate">settings</span>',
+                    smallText: 'SETTINGS',
+                    modal: 'modal-settings'
+                };
+                gridItems = [...nonSettings.slice(0, 3), settingsItem];
+            }
+
+            gridItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'small-nav-item';
+                div.onclick = () => openModal(item.modal);
+                div.innerHTML = `
+                    <div class="nav-icon-small">${item.icon}</div>
+                    <div class="nav-text-small">${item.smallText}</div>
+                `;
+                secondaryGrid.appendChild(div);
+            });
+        }
+    }
+
+    function toggleDropdown(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('service-dropdown');
+        if (menu) {
+            menu.classList.toggle('active');
+            if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+                window.soundSystem.playRadioClick();
+            }
+        }
+    }
+
 
     // -----------------------------------------------------
     // 3. UI STATE SYNC & INPUT BINDINGS
@@ -905,23 +1003,254 @@
     }
 
     // -----------------------------------------------------
-    // 9. TRAFFIC CODES & IMPOUND MATRIX
+    // 9. TRAFFIC CODES & REGULATIONS ENGINE
     // -----------------------------------------------------
+    let currentTrafficCategoryFilter = 'ALL';
+    let searchTrafficQuery = '';
+
+    function getAllTrafficRegulations() {
+        const dataObj = window.SAHP_DATA || window.LSPD_DATA;
+        if (!dataObj) return [];
+
+        const tcList = (dataObj.trafficCodes || []).map(item => ({
+            ...item,
+            isTrafficCode: true,
+            starCount: item.starCount !== undefined ? item.starCount : (item.stars && item.stars !== '-' ? (item.stars.match(/⭐|\u2b50/g) || []).length : 0),
+            towing: item.towing !== undefined ? item.towing : (
+                (item.remarks && /tow/i.test(item.remarks)) ||
+                item.category === 'Towing & Impounds' ||
+                (item.code && item.code.startsWith('T.C. 6.2')) ||
+                item.code === 'T.C. 6.4' ||
+                item.code === 'T.C. 8.1'
+            )
+        }));
+
+        const pcTraffic = (dataObj.penalCodes || [])
+            .filter(c => c.category === 'Traffic Regulations (Penal)')
+            .map(item => ({
+                ...item,
+                isPenalTraffic: true,
+                towing: item.code === 'P.C. 6.3' // Abandonment of Vehicle
+            }));
+
+        return [...tcList, ...pcTraffic];
+    }
+
     function renderTrafficCodes() {
         const container = document.getElementById('traffic-table-body');
         const dataObj = window.SAHP_DATA || window.LSPD_DATA;
-        if (!container || !dataObj || !dataObj.trafficCodes) return;
+        if (!container || !dataObj) return;
 
-        const codes = dataObj.trafficCodes;
-        container.innerHTML = codes.map(item => `
-            <div class="penal-row" style="grid-template-columns: 110px 1fr 100px 80px 1fr;">
-                <span class="penal-badge-code">${item.code}</span>
-                <span style="font-weight:600; color:var(--text-main);">${item.title}</span>
-                <span style="color:#34d399; font-weight:700;">${item.fine}</span>
-                <span style="color:#38bdf8;">${item.sentence}</span>
-                <span style="font-size:0.75rem; color:var(--text-muted);">${item.remarks || '-'}</span>
-            </div>
-        `).join('');
+        const allTraffic = getAllTrafficRegulations();
+
+        // Update total count badge
+        const countBadge = document.getElementById('traffic-total-count');
+        if (countBadge) countBadge.textContent = allTraffic.length;
+
+        const filtered = allTraffic.filter(item => {
+            let matchesCat = false;
+            if (currentTrafficCategoryFilter === 'ALL') {
+                matchesCat = true;
+            } else if (currentTrafficCategoryFilter === 'Towing & Impounds') {
+                matchesCat = item.category === 'Towing & Impounds' || item.towing === true;
+            } else {
+                matchesCat = item.category === currentTrafficCategoryFilter;
+            }
+
+            const q = searchTrafficQuery.toLowerCase();
+            const matchesQuery = !searchTrafficQuery ||
+                item.code.toLowerCase().includes(q) ||
+                item.title.toLowerCase().includes(q) ||
+                (item.remarks && item.remarks.toLowerCase().includes(q)) ||
+                (item.fine && item.fine.toLowerCase().includes(q));
+
+            return matchesCat && matchesQuery;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = `
+                <div style="padding: 2.5rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                    <span class="material-symbols-outlined" style="font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.5;">search_off</span><br>
+                    No traffic codes found matching "${searchTrafficQuery}"
+                </div>
+            `;
+            return;
+        }
+
+        const selectedList = state.selectedTrafficCharges || [];
+
+        container.innerHTML = filtered.map(item => {
+            const isSelected = selectedList.some(c => c.code === item.code);
+            const starsDisplay = item.stars && item.stars !== '-' ? item.stars : '-';
+
+            let bailOrTowBadge = '';
+            if (item.noBail) {
+                bailOrTowBadge = '<span class="penal-badge-bail-no">NO BAIL</span>';
+            } else if (item.towing) {
+                bailOrTowBadge = '<span class="traffic-badge-tow">TOWABLE</span>';
+            } else if (item.sentenceMonths > 0) {
+                bailOrTowBadge = '<span class="penal-badge-bail-yes">BAIL OK</span>';
+            } else {
+                bailOrTowBadge = '<span class="traffic-badge-cite">CITE ONLY</span>';
+            }
+
+            const codeClass = item.isPenalTraffic ? 'traffic-badge-pc' : 'traffic-badge-code';
+
+            return `
+                <div class="traffic-row ${isSelected ? 'selected' : ''}" onclick="window.app.toggleSelectTrafficCharge('${item.code}')">
+                    <span class="${codeClass}">${item.code}</span>
+                    <div>
+                        <div style="font-weight:600; color:var(--text-main); line-height:1.35;">${item.title}</div>
+                        ${item.remarks ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${item.remarks}</div>` : ''}
+                    </div>
+                    <span style="color:#34d399; font-weight:700;">${item.fine || '-'}</span>
+                    <span style="color:#38bdf8;">${item.sentence || '-'}</span>
+                    <span class="penal-badge-stars">${starsDisplay}</span>
+                    <span>${bailOrTowBadge}</span>
+                    <span>
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); window.app.toggleSelectTrafficCharge('${item.code}')" style="cursor:pointer; accent-color:var(--secondary);">
+                    </span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function toggleSelectTrafficCharge(codeStr) {
+        const allTraffic = getAllTrafficRegulations();
+        const codeObj = allTraffic.find(c => c.code === codeStr);
+        if (!codeObj) return;
+
+        if (!Array.isArray(state.selectedTrafficCharges)) {
+            state.selectedTrafficCharges = [];
+        }
+
+        const idx = state.selectedTrafficCharges.findIndex(c => c.code === codeStr);
+        if (idx !== -1) {
+            state.selectedTrafficCharges.splice(idx, 1);
+        } else {
+            state.selectedTrafficCharges.push(codeObj);
+        }
+
+        stateManager.save();
+        playSound('playRadioClick');
+        renderTrafficCodes();
+        updateTrafficCitationSummary();
+    }
+
+    function clearSelectedTrafficCharges() {
+        state.selectedTrafficCharges = [];
+        stateManager.save();
+        playSound('playRadioClick');
+        renderTrafficCodes();
+        updateTrafficCitationSummary();
+    }
+
+    function updateTrafficCitationSummary() {
+        const list = state.selectedTrafficCharges || [];
+        const count = list.length;
+        let totalFine = 0;
+        let totalMonths = 0;
+        let maxStars = 0;
+        let hasNoBail = false;
+        let towingRequired = false;
+        let pdaTextList = [];
+
+        list.forEach(c => {
+            totalFine += (c.fineAmount || 0);
+            totalMonths += (c.sentenceMonths || 0);
+            const stars = c.starCount || (c.stars && c.stars !== '-' ? (c.stars.match(/⭐|\u2b50/g) || []).length : 0);
+            if (stars > maxStars) maxStars = stars;
+            if (c.noBail) hasNoBail = true;
+            if (c.towing || (c.remarks && /tow/i.test(c.remarks)) || c.category === 'Towing & Impounds') {
+                towingRequired = true;
+            }
+            pdaTextList.push(`${c.code} ${c.title}`);
+        });
+
+        const fineEl = document.getElementById('traffic-stat-total-fine');
+        if (fineEl) fineEl.textContent = `$${totalFine.toLocaleString()}`;
+
+        const sentenceEl = document.getElementById('traffic-stat-total-sentence');
+        if (sentenceEl) sentenceEl.textContent = totalMonths > 0 ? `${totalMonths} mo` : '-';
+
+        const starsEl = document.getElementById('traffic-stat-max-stars');
+        if (starsEl) starsEl.textContent = maxStars > 0 ? '⭐'.repeat(maxStars) : '-';
+
+        const towingEl = document.getElementById('traffic-stat-towing');
+        if (towingEl) {
+            if (count === 0) {
+                towingEl.textContent = '-';
+                towingEl.className = 'citation-stat-val';
+            } else if (towingRequired) {
+                towingEl.textContent = 'TOW AUTHORIZED';
+                towingEl.className = 'citation-stat-val traffic-stat-tow';
+            } else {
+                towingEl.textContent = 'NO TOW';
+                towingEl.className = 'citation-stat-val';
+            }
+        }
+
+        const bailEl = document.getElementById('traffic-stat-bail');
+        if (bailEl) {
+            if (count === 0) {
+                bailEl.textContent = '-';
+                bailEl.className = 'citation-stat-val';
+            } else if (hasNoBail) {
+                bailEl.textContent = 'NO BAIL';
+                bailEl.className = 'citation-stat-val nobail';
+            } else if (totalMonths > 0) {
+                bailEl.textContent = 'ELIGIBLE';
+                bailEl.className = 'citation-stat-val money';
+            } else {
+                bailEl.textContent = 'CITE ONLY';
+                bailEl.className = 'citation-stat-val';
+            }
+        }
+
+        const pdaBox = document.getElementById('traffic-citation-pda-text');
+        if (pdaBox) {
+            pdaBox.textContent = pdaTextList.length > 0 ? pdaTextList.join(' | ') : 'Select one or more traffic codes or regulations above to generate PDA citation charges...';
+        }
+    }
+
+    function copyTrafficPdaCitation() {
+        const pdaBox = document.getElementById('traffic-citation-pda-text');
+        if (!pdaBox || !state.selectedTrafficCharges || state.selectedTrafficCharges.length === 0) {
+            alert('Please select at least one traffic charge first.');
+            return;
+        }
+
+        copyTextToClipboard(pdaBox.textContent).then(() => {
+            playSound('playCopyBeep');
+            const btn = document.getElementById('btn-copy-traffic-pda');
+            if (btn) {
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">done</span> Copied to PDA!';
+                setTimeout(() => {
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy for PDA (J)';
+                }, 1500);
+            }
+        });
+    }
+
+    function transferTrafficToPenalEngine() {
+        if (!state.selectedTrafficCharges || state.selectedTrafficCharges.length === 0) {
+            alert('No traffic charges selected to transfer.');
+            return;
+        }
+
+        let addedCount = 0;
+        state.selectedTrafficCharges.forEach(tc => {
+            if (!state.selectedCharges.some(c => c.code === tc.code)) {
+                state.selectedCharges.push(tc);
+                addedCount++;
+            }
+        });
+
+        stateManager.save();
+        playSound('playRadioClick');
+        renderPenalCodes();
+        updateCitationSummary();
+        alert(`Transferred ${addedCount} traffic charge(s) to Penal Code Engine!`);
     }
 
     function calculateImpoundFee(val) {
@@ -1159,6 +1488,128 @@
     // -----------------------------------------------------
     // 15. GLOBAL EXPOSURE & EVENT BINDINGS
     // -----------------------------------------------------
+    
+    // -----------------------------------------------------
+    // 6. MODAL MANAGER (EMS Companion Architecture)
+    // -----------------------------------------------------
+    class ModalManager {
+        constructor() {
+            this.overlay = null;
+            this.activeModal = null;
+            this.modalBehindNotes = null;
+            this.closeTimeout = null;
+        }
+
+        init() {
+            this.overlay = document.getElementById('modalOverlay');
+            if (!this.overlay) return;
+
+            // Clicking backdrop outside modal-content closes active modal
+            this.overlay.addEventListener('click', (e) => {
+                if (e.target === this.overlay) {
+                    this.closeAll();
+                }
+            });
+        }
+
+        open(modalId) {
+            if (this.closeTimeout) {
+                clearTimeout(this.closeTimeout);
+                this.closeTimeout = null;
+            }
+
+            if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
+            if (this.overlay) {
+                this.overlay.classList.remove('closing');
+                this.overlay.classList.add('active');
+            }
+
+            if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+                window.soundSystem.playRadioClick();
+            }
+
+            if (modalId === 'modal-notes') {
+                const currentActive = (this.activeModal && this.activeModal.id !== 'modal-notes')
+                    ? this.activeModal
+                    : document.querySelector('.modal-content.active:not(#modal-notes)');
+                if (currentActive) {
+                    this.modalBehindNotes = currentActive;
+                    currentActive.classList.add('in-background');
+                }
+                document.querySelectorAll('.modal-content').forEach(m => {
+                    if (m.id !== modalId && m !== this.modalBehindNotes) {
+                        m.classList.remove('active', 'closing', 'in-background');
+                    }
+                });
+            } else {
+                if (this.modalBehindNotes) {
+                    this.modalBehindNotes.classList.remove('in-background');
+                    this.modalBehindNotes = null;
+                }
+                document.querySelectorAll('.modal-content').forEach(m => {
+                    if (m.id !== modalId) {
+                        m.classList.remove('active', 'closing', 'in-background');
+                    }
+                });
+            }
+
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('closing', 'in-background');
+                modal.classList.add('active');
+                this.activeModal = modal;
+            }
+        }
+
+        closeAll() {
+            if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
+            if (!this.overlay || !this.overlay.classList.contains('active')) return;
+
+            if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+                window.soundSystem.playRadioClick();
+            }
+
+            // If Quick Notes is open above a background modal, close only Quick Notes and restore background modal
+            const notesModal = document.getElementById('modal-notes');
+            if (notesModal && notesModal.classList.contains('active') && this.modalBehindNotes) {
+                notesModal.classList.add('closing');
+                const bgModal = this.modalBehindNotes;
+                this.modalBehindNotes = null;
+
+                setTimeout(() => {
+                    notesModal.classList.remove('active', 'closing');
+                    if (bgModal) {
+                        bgModal.classList.remove('in-background');
+                        this.activeModal = bgModal;
+                    }
+                }, 200);
+                return;
+            }
+
+            const activeModals = document.querySelectorAll('.modal-content.active, .sub-modal.active');
+            if (activeModals.length === 0) {
+                this.overlay.classList.remove('active', 'closing');
+                return;
+            }
+
+            this.overlay.classList.add('closing');
+            activeModals.forEach(m => m.classList.add('closing'));
+
+            if (this.closeTimeout) clearTimeout(this.closeTimeout);
+            this.closeTimeout = setTimeout(() => {
+                if (this.overlay) {
+                    this.overlay.classList.remove('active', 'closing');
+                }
+                activeModals.forEach(m => m.classList.remove('active', 'closing', 'in-background'));
+                this.activeModal = null;
+                this.modalBehindNotes = null;
+                this.closeTimeout = null;
+            }, 230);
+        }
+    }
+
+    const modalManager = new ModalManager();
+
     window.app = {
         state,
         stateManager,
@@ -1176,7 +1627,18 @@
         toggleSelectCharge,
         clearSelectedCharges,
         copyPdaCitation,
+        toggleSelectTrafficCharge,
+        clearSelectedTrafficCharges,
+        copyTrafficPdaCitation,
+        updateTrafficCitationSummary,
+        transferTrafficToPenalEngine,
+        setTrafficCategoryFilter: (cat) => {
+            currentTrafficCategoryFilter = cat;
+            renderTrafficCodes();
+        },
         calculateImpoundFee,
+        renderTrafficCodes,
+        renderPenalCodes,
         openDiscordChannel,
         copyQuickNotes,
         clearQuickNotes,
@@ -1196,6 +1658,7 @@
         renderTrafficCodes();
         renderArticle7();
         updateCitationSummary();
+        updateTrafficCitationSummary();
         updateDefaultsBadge();
 
         // Update live clocks every 500ms
@@ -1214,6 +1677,15 @@
             searchInput.addEventListener('input', (e) => {
                 searchQuery = e.target.value.trim();
                 renderPenalCodes();
+            });
+        }
+
+        // Search traffic codes listener
+        const trafficSearchInput = document.getElementById('traffic-search-input');
+        if (trafficSearchInput) {
+            trafficSearchInput.addEventListener('input', (e) => {
+                searchTrafficQuery = e.target.value.trim();
+                renderTrafficCodes();
             });
         }
     });
@@ -1324,6 +1796,18 @@ function filterPenalCategory(chip, categoryName) {
     }
 }
 
+function filterTrafficCategory(chip, categoryName) {
+    document.querySelectorAll('#traffic-categories-bar .penal-chip').forEach(c => c.classList.remove('active'));
+    if (chip) chip.classList.add('active');
+
+    if (window.app && window.app.setTrafficCategoryFilter) {
+        window.app.setTrafficCategoryFilter(categoryName);
+    }
+    if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+        window.soundSystem.playRadioClick();
+    }
+}
+
 function filterDresscodes(btn, category) {
     document.querySelectorAll('.dresscode-rank-chip').forEach(c => c.classList.remove('active'));
     if (btn) btn.classList.add('active');
@@ -1383,3 +1867,44 @@ function closeAboutTeam() {
         }
     }
 }
+
+
+window.toggleDropdown = function(e) {
+    if (window.app && window.app.toggleDropdown) {
+        window.app.toggleDropdown(e);
+    }
+};
+
+window.renderBottomNav = function() {
+    if (window.app && window.app.renderBottomNav) {
+        window.app.renderBottomNav();
+    }
+};
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#main-service-card')) {
+        document.getElementById('service-dropdown')?.classList.remove('active');
+    }
+});
+
+
+// Backdrop click listeners to close modal when clicking outside
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('modalOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                closeModals();
+            }
+        });
+    }
+
+    const aboutPage = document.getElementById('about-team-page');
+    if (aboutPage) {
+        aboutPage.addEventListener('click', (e) => {
+            if (e.target === aboutPage) {
+                closeAboutTeam();
+            }
+        });
+    }
+});
