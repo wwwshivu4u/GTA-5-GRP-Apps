@@ -210,15 +210,25 @@ The companion features an advanced window-stacking engine:
 
 ---
 
-## ⌨️ Keyboard Shortcuts Cheatsheet
+## ⌨️ In-Game Tactical Keyboard Shortcuts Cheatsheet
 
-| Shortcut | Action |
-| :--- | :--- |
-| `Ctrl + K` or `Cmd + K` | Open Universal Tactical Omni-Search |
-| `/` | Quick-open Omni Search (when not typing in an input) |
-| `↑` / `↓` Arrow Keys | Navigate Omni Search results |
-| `Enter` | Copy highlighted search command / citation |
-| `Escape` | Dismiss top active modal or close search |
+Interactive gaming-style HUD keycap badges are visible directly across the terminal layout:
+
+| HUD Keycap | Hotkey | Context | Action |
+| :---: | :--- | :--- | :--- |
+| `[1]` | `1` | Global (Dashboard) | Open **Bodycam & Protocols** |
+| `[2]` | `2` | Global (Dashboard) | Open **Comms & 10-Codes Directory** |
+| `[3]` | `3` | Global (Dashboard) | Open **Roleplay Commands (/me, /do, /try, /todo)** |
+| `[4]` | `4` | Global (Dashboard / Dock) | Open **Penal & Traffic Codes Engine** |
+| `[5]` | `5` | Global (Dashboard) | Open **Department Utilities ("More" Modal)** |
+| `[N]` | `N` | Tactical Dock | Open **Quick Field Notepad** |
+| `[T]` | `T` | Tactical Dock | Open **25-Minute Custody Processing Timer** |
+| `[U]` | `U` | Top Status Bar | Toggle **Duty Status** (Copies 10-8 / 10-9 to clipboard) |
+| `[M]` | `M` | Tactical Dock | Toggle **MDT Audio FX** (Mute / Unmute radio chirps) |
+| `[^K]` or `[/]` | `Ctrl + K` or `/` | Global | Open **Tactical Omni-Search Command Palette** |
+| `[ESC]` | `Escape` | Active Modals | Sequentially dismiss top modal / exit search |
+| `[↑]` `[↓]` | Arrow Keys | Omni-Search | Navigate search results list |
+| `[ENTER]` | Enter Key | Omni-Search | Instant-copy selected command or jump to target |
 
 ---
 

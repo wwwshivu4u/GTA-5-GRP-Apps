@@ -2731,20 +2731,105 @@ function initOmniSearch() {
     });
 }
 
-// Global Keyboard Shortcuts: Ctrl+K / Cmd+K or / to open Omni Search
+// =====================================================
+// 18. GLOBAL TACTICAL IN-GAME KEYBOARD SHORTCUTS
+// =====================================================
 document.addEventListener('keydown', (e) => {
+    // 1. Ctrl+K or Cmd+K: Always open Omni Search (even if focused elsewhere)
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         openOmniSearch();
         return;
     }
-    if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && !document.activeElement.isContentEditable) {
+
+    // 2. Ignore single-key game shortcuts when user is typing in form inputs, textareas, selects, or contenteditables
+    const activeEl = document.activeElement;
+    const isTyping = activeEl && (
+        ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName) ||
+        activeEl.isContentEditable
+    );
+    if (isTyping) return;
+
+    // 3. Ignore if user is pressing browser modifier combinations (Ctrl, Alt, Meta)
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    const key = e.key;
+
+    // [/] - Open Tactical Omni-Search Command Palette
+    if (key === '/') {
         const searchModal = document.getElementById('modal-search');
         if (!searchModal || !searchModal.classList.contains('active')) {
             e.preventDefault();
             openOmniSearch();
             return;
         }
+    }
+
+    // [1] - Bodycam & Protocols
+    if (key === '1') {
+        e.preventDefault();
+        openModal('modal-bodycam');
+        return;
+    }
+
+    // [2] - Comms & 10-Codes
+    if (key === '2') {
+        e.preventDefault();
+        openModal('modal-radio');
+        return;
+    }
+
+    // [3] - Roleplay Commands (/me, /do, /try, /todo)
+    if (key === '3') {
+        e.preventDefault();
+        openModal('modal-roleplay');
+        return;
+    }
+
+    // [4] - Combined Penal Codes & Traffic Codes Engine
+    if (key === '4') {
+        e.preventDefault();
+        openModal('modal-penal');
+        return;
+    }
+
+    // [5] - Department Utilities ("More" Modal)
+    if (key === '5') {
+        e.preventDefault();
+        openModal('modal-more');
+        return;
+    }
+
+    // [N] or [n] - Quick Field Notepad
+    if (key === 'n' || key === 'N') {
+        e.preventDefault();
+        openModal('modal-notes');
+        return;
+    }
+
+    // [T] or [t] - 25-Minute Custody Processing Timer
+    if (key === 't' || key === 'T') {
+        e.preventDefault();
+        openModal('modal-arrest');
+        return;
+    }
+
+    // [U] or [u] - Toggle Duty Status (Copies 10-8 / 10-9)
+    if (key === 'u' || key === 'U') {
+        e.preventDefault();
+        if (window.app && typeof window.app.toggleDutyStatus === 'function') {
+            window.app.toggleDutyStatus();
+        }
+        return;
+    }
+
+    // [M] or [m] - Toggle MDT Audio FX
+    if (key === 'm' || key === 'M') {
+        e.preventDefault();
+        if (window.app && typeof window.app.toggleAudio === 'function') {
+            window.app.toggleAudio();
+        }
+        return;
     }
 });
 

@@ -56,9 +56,12 @@
             <!-- Department Branding & Duty Indicator -->
             <div class="topbar-branding">
                 <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini" title="San Andreas Highway Patrol">
-                <button class="topbar-duty-icon-btn off-duty" id="topbar-duty-btn" onclick="window.app.toggleDutyStatus()" title="Toggle Duty Status (Copy 10-8 / 10-9)" aria-label="Toggle Duty Status">
-                    <span class="material-symbols-outlined" id="topbar-duty-icon">power_settings_new</span>
-                </button>
+                <div class="topbar-duty-wrap">
+                    <button class="topbar-duty-icon-btn off-duty" id="topbar-duty-btn" onclick="window.app.toggleDutyStatus()" title="Toggle Duty Status (Copy 10-8 / 10-9) [U]" aria-label="Toggle Duty Status">
+                        <span class="material-symbols-outlined" id="topbar-duty-icon">power_settings_new</span>
+                    </button>
+                    <kbd class="dock-kbd">U</kbd>
+                </div>
                 <select id="topbar-job-type" class="topbar-job-select" onchange="window.app.setJobType(this.value)" title="Active Duty Assignment">
                     <option value="" disabled selected>Select Duty...</option>
                     <option value="Highway Patrol">Highway Patrol</option>
@@ -159,7 +162,10 @@
                     <div class="card-glow glow-rose"></div>
                     <div class="card-header-bar">
                         <span class="card-badge badge-rose">MANDATORY</span>
-                        <span class="card-tag">LOG-01</span>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <span class="card-tag">LOG-01</span>
+                            <kbd class="hud-kbd" title="Shortcut Key: 1">1</kbd>
+                        </div>
                     </div>
                     <div class="card-icon-wrap icon-rose">
                         <span class="material-symbols-outlined icon-gradient-rose">videocam</span>
@@ -177,7 +183,10 @@
                     <div class="card-glow glow-blue"></div>
                     <div class="card-header-bar">
                         <span class="card-badge badge-blue">DISPATCH</span>
-                        <span class="card-tag">RAD-02</span>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <span class="card-tag">RAD-02</span>
+                            <kbd class="hud-kbd" title="Shortcut Key: 2">2</kbd>
+                        </div>
                     </div>
                     <div class="card-icon-wrap icon-blue">
                         <span class="material-symbols-outlined icon-gradient-blue">podcasts</span>
@@ -195,7 +204,10 @@
                     <div class="card-glow glow-purple"></div>
                     <div class="card-header-bar">
                         <span class="card-badge badge-purple">ROLEPLAY</span>
-                        <span class="card-tag">CMD-03</span>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <span class="card-tag">CMD-03</span>
+                            <kbd class="hud-kbd" title="Shortcut Key: 3">3</kbd>
+                        </div>
                     </div>
                     <div class="card-icon-wrap icon-purple">
                         <span class="material-symbols-outlined icon-gradient-purple">psychology</span>
@@ -213,7 +225,10 @@
                     <div class="card-glow glow-gold"></div>
                     <div class="card-header-bar">
                         <span class="card-badge badge-gold">ENGINE &amp; CITATIONS</span>
-                        <span class="card-tag">LEG-04</span>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <span class="card-tag">LEG-04</span>
+                            <kbd class="hud-kbd" title="Shortcut Key: 4">4</kbd>
+                        </div>
                     </div>
                     <div class="card-icon-wrap icon-gold">
                         <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
@@ -231,7 +246,10 @@
                     <div class="card-glow glow-emerald"></div>
                     <div class="card-header-bar">
                         <span class="card-badge badge-emerald">DEPARTMENT</span>
-                        <span class="card-tag">MOR-05</span>
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                            <span class="card-tag">MOR-05</span>
+                            <kbd class="hud-kbd" title="Shortcut Key: 5">5</kbd>
+                        </div>
                     </div>
                     <div class="card-icon-wrap icon-emerald">
                         <span class="material-symbols-outlined icon-gradient-emerald">grid_view</span>
@@ -256,7 +274,7 @@
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">videocam</span> Bodycam Protocols</span>
                     <span class="duty-pill off-duty" id="modal-duty-status-pill"><span class="pulse-dot"></span> <span class="duty-pill-text">OFF DUTY</span></span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="tabs-header">
@@ -438,7 +456,7 @@
                         <button class="btn btn-secondary btn-sm discord-jump-btn" data-discord-channel="radiocodes" onclick="window.app.openDiscordChannel('radiocodes')">
                             <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #radio-codes
                         </button>
-                        <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                        <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                     </div>
                 </div>
 
@@ -803,7 +821,7 @@
             <div class="modal-content" id="modal-dresscodes" style="max-width: 950px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.4rem; margin-right:6px;">apparel</span> Department Uniform &amp; Dress Codes</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="modal-body-scroll">
@@ -1003,7 +1021,7 @@
             <div class="modal-content" id="modal-roleplay" style="max-width: 950px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-purple" style="font-size:1.4rem; margin-right:6px;">psychology</span> Roleplay Commands (/me, /try, /do, /todo) &amp; HR</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="tabs-header">
@@ -1211,7 +1229,7 @@
             <div class="modal-content" id="modal-penal" style="max-width: 980px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.4rem; margin-right:6px;">gavel</span> EN3 Legal Code &amp; Citation Engine</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="legal-engine-tab-bar">
@@ -1467,7 +1485,7 @@
             <div class="modal-content" id="modal-arrest" style="max-width: 900px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-rose" style="font-size:1.4rem; margin-right:6px;">lock_clock</span> Arrest Procedure &amp; 25-Minute Timer</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="modal-body-scroll">
@@ -1607,7 +1625,7 @@ Do you understand the rights I just read to you?"
             <div class="modal-content" id="modal-article7" style="max-width: 900px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">local_parking</span> Article 7 Parking Regulations</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="modal-body-scroll">
@@ -1642,7 +1660,7 @@ Do you understand the rights I just read to you?"
             <div class="modal-content" id="modal-prohibited" style="max-width: 700px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; margin-right:6px;">block</span> §2.4 List of Prohibited Items</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="modal-body-scroll">
@@ -1679,7 +1697,7 @@ Do you understand the rights I just read to you?"
             <div class="modal-content" id="modal-settings">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-slate" style="font-size:1.4rem; margin-right:6px;">tune</span> Settings &amp; Configuration</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="modal-body-scroll">
@@ -1818,7 +1836,7 @@ Do you understand the rights I just read to you?"
             <div class="modal-content" id="modal-notes" style="max-width: 820px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-amber" style="font-size:1.4rem; margin-right:6px;">edit_note</span> Quick Officer Notepad</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="modal-body-scroll" style="display:flex; flex-direction:column; gap:0.75rem;">
@@ -1852,7 +1870,7 @@ Do you understand the rights I just read to you?"
             <div class="modal-content" id="modal-more" style="max-width: 900px;">
                 <div class="modal-header">
                     <span style="display: flex; align-items: center;"><span class="material-symbols-outlined icon-gradient-emerald" style="font-size:1.4rem; margin-right:6px;">grid_view</span> Department Utilities &amp; Secondary Tools</span>
-                    <button class="close-btn" onclick="closeModals()"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals()" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
 
                 <div class="modal-body-scroll">
@@ -1993,7 +2011,7 @@ Do you understand the rights I just read to you?"
                         <img src="SAHP-LOGO.png" alt="SAHP" style="width:28px; height:28px;">
                         <span>San Andreas Highway Patrol - MDT Companion</span>
                     </span>
-                    <button class="close-btn" onclick="closeModals('modal-about')"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                    <button class="close-btn" onclick="closeModals('modal-about')" title="Close [ESC]"><kbd class="esc-kbd">ESC</kbd><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
                 </div>
                 <div class="modal-body-scroll" style="text-align:center; padding: 2rem;">
                     <img src="SAHP-LOGO.png" alt="SAHP Badge" style="width: 140px; height: 140px; margin: 0 auto 1.2rem; border-radius: 50%; box-shadow: 0 0 25px rgba(245,158,11,0.4);">
@@ -2072,26 +2090,31 @@ Do you understand the rights I just read to you?"
 
         <!-- CONSOLIDATED TACTICAL FLOATING DOCK -->
         <div class="tactical-dock" id="tactical-dock">
-            <button class="dock-btn dock-search-btn" id="dock-search-btn" onclick="openOmniSearch()" title="Tactical Omni-Search (Ctrl+K)" aria-label="Universal Search">
+            <button class="dock-btn dock-search-btn" id="dock-search-btn" onclick="openOmniSearch()" title="Tactical Omni-Search (Ctrl+K or /)" aria-label="Universal Search">
                 <span class="material-symbols-outlined icon-gradient-blue" style="font-size:1.35rem;">search</span>
-                <span class="dock-tooltip">Omni Search</span>
+                <kbd class="dock-kbd">^K</kbd>
+                <span class="dock-tooltip">Omni Search [Ctrl+K]</span>
             </button>
-            <button class="dock-btn" onclick="openModal('modal-notes')" title="Quick Field Notepad" aria-label="Quick Notepad">
+            <button class="dock-btn" onclick="openModal('modal-notes')" title="Quick Field Notepad [N]" aria-label="Quick Notepad">
                 <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
-                <span class="dock-tooltip">Notepad</span>
+                <kbd class="dock-kbd">N</kbd>
+                <span class="dock-tooltip">Notepad [N]</span>
             </button>
-            <button class="dock-btn" onclick="openModal('modal-penal')" title="Penal Code &amp; Citation Calculator" aria-label="Penal Calculator">
+            <button class="dock-btn" onclick="openModal('modal-penal')" title="Penal Code &amp; Citation Calculator [4]" aria-label="Penal Calculator">
                 <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
-                <span class="dock-tooltip">Penal Engine</span>
+                <kbd class="dock-kbd">4</kbd>
+                <span class="dock-tooltip">Penal Engine [4]</span>
             </button>
-            <button class="dock-btn" onclick="openModal('modal-arrest')" title="25-Min Custody Timer" aria-label="Arrest Timer">
+            <button class="dock-btn" onclick="openModal('modal-arrest')" title="25-Min Custody Timer [T]" aria-label="Arrest Timer">
                 <span class="material-symbols-outlined icon-gradient-rose">lock_clock</span>
+                <kbd class="dock-kbd">T</kbd>
                 <span id="dock-arrest-val" class="dock-badge hidden">25:00</span>
-                <span class="dock-tooltip">Custody Timer</span>
+                <span class="dock-tooltip">Custody Timer [T]</span>
             </button>
-            <button class="dock-btn" id="dock-audio-btn" onclick="window.app.toggleAudio()" title="MDT Audio FX" aria-label="Toggle Audio">
+            <button class="dock-btn" id="dock-audio-btn" onclick="window.app.toggleAudio()" title="MDT Audio FX [M]" aria-label="Toggle Audio">
                 <span class="material-symbols-outlined" id="dock-audio-icon" style="color: #38bdf8;">volume_up</span>
-                <span class="dock-tooltip">Audio FX</span>
+                <kbd class="dock-kbd">M</kbd>
+                <span class="dock-tooltip">Audio FX [M]</span>
             </button>
             <button class="dock-btn dock-badge-btn" onclick="openModal('modal-about')" title="SAHP Command &amp; Manual" aria-label="About SAHP">
                 <img src="SAHP-LOGO.png" alt="SAHP" class="dock-sahp-logo">

@@ -151,6 +151,9 @@ The **SAHP Companion** is a dedicated, mission-critical Mobile Data Terminal (MD
 - **Universal Tactical Omni-Search (`Ctrl+K` / `/`)**:
   - Global Command Palette accessible from anywhere on the screen or via keyboard shortcuts.
   - Instant unified search across bodycams, radio codes, penal articles, traffic fines, and roleplay procedures.
+- **Tactical In-Game Hotkeys & HUD Keycap Prompts**:
+  - Gaming-style keycap prompts displayed directly on the UI (`[1-5]`, `[N]`, `[T]`, `[U]`, `[M]`, `[Ctrl+K]`, `[ESC]`).
+  - Rapid one-touch navigation for patrol officers with input-safe text field suppression.
 
 ---
 

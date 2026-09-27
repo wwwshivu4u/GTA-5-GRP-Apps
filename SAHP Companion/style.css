@@ -665,6 +665,84 @@ body::before {
     opacity: 0.85;
 }
 
+/* =====================================================
+   TACTICAL GAMING HUD KEYCAPS (SHORTCUT HINTS)
+   ===================================================== */
+.hud-kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 800;
+    line-height: 1;
+    padding: 2px 6px;
+    min-width: 19px;
+    height: 19px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #38bdf8;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 8px rgba(56, 189, 248, 0.25);
+    letter-spacing: 0.5px;
+    user-select: none;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tactical-card:hover .hud-kbd {
+    color: #ffffff;
+    background: rgba(14, 165, 233, 0.35);
+    border-color: #38bdf8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 12px rgba(56, 189, 248, 0.6);
+    transform: translateY(-1px) scale(1.08);
+}
+
+.dock-kbd {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.56rem;
+    font-weight: 800;
+    padding: 1px 4px;
+    min-width: 14px;
+    height: 14px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bae6fd;
+    background: rgba(11, 19, 43, 0.96);
+    border: 1px solid rgba(56, 189, 248, 0.5);
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 6px rgba(56, 189, 248, 0.3);
+    z-index: 5;
+    pointer-events: none;
+    letter-spacing: 0;
+    transition: all 0.2s ease;
+}
+
+.dock-btn:hover .dock-kbd {
+    border-color: #38bdf8;
+    color: #ffffff;
+    background: #0284c7;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+    transform: scale(1.1);
+}
+
+.topbar-duty-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.topbar-duty-wrap .dock-kbd {
+    bottom: -2px;
+    right: -2px;
+}
+
+
 /* Card Icon Wrap */
 .card-icon-wrap {
     width: 44px;
@@ -1172,21 +1250,41 @@ body::before {
 }
 
 .modal-header .close-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: var(--text-muted);
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    display: flex;
+    padding: 0.25rem 0.55rem;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.35rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    user-select: none;
 }
 .modal-header .close-btn:hover {
-    background: rgba(239, 68, 68, 0.25);
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
     color: #ef4444;
+}
+.modal-header .close-btn .esc-kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    line-height: 1;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+.modal-header .close-btn:hover .esc-kbd {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
 }
 
 .modal-body-scroll {
