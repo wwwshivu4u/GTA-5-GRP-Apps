@@ -143,34 +143,226 @@
             </div>
         </div>
 
-        <!-- BOTTOM DASHBOARD NAVIGATION (EMS Companion UI Architecture) -->
-        <div class="bottom-nav">
-            <!-- Row 1: Primary Controls -->
-            <div class="nav-row">
-                <div class="nav-item" onclick="openModal('modal-bodycam')">
-                    <div class="nav-icon"><span class="material-symbols-outlined icon-gradient-rose" style="font-size: 3.2rem;">videocam</span></div>
-                    <div class="nav-text">BODYCAM</div>
+        <!-- MAIN TACTICAL DASHBOARD GRID (Full Screen, No Empty Space) -->
+        <main class="dashboard-main">
+            <div class="tactical-grid">
+                <!-- 1: Bodycam & Protocols -->
+                <div class="tactical-card" onclick="openModal('modal-bodycam')">
+                    <div class="card-glow glow-rose"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-rose">MANDATORY</span>
+                        <span class="card-tag">LOG-01</span>
+                    </div>
+                    <div class="card-icon-wrap icon-rose">
+                        <span class="material-symbols-outlined icon-gradient-rose">videocam</span>
+                    </div>
+                    <h3 class="card-title">BODYCAM &amp; PROTOCOLS</h3>
+                    <p class="card-desc">Uniform &amp; Undercover attach sequences, red-light check, cloud backup &amp; finishing shift logs.</p>
+                    <div class="card-footer-action">
+                        <span>Open Protocols</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
                 </div>
-                <div class="nav-item" onclick="openModal('modal-radio')">
-                    <div class="nav-icon"><span class="material-symbols-outlined icon-gradient-blue" style="font-size: 3.2rem;">podcasts</span></div>
-                    <div class="nav-text">COMMS &amp; LOGS</div>
-                </div>
-            </div>
 
-            <!-- Row 2: Dynamic Services & Tools -->
-            <div class="nav-row">
-                <div class="nav-item" id="main-service-card">
-                    <div class="nav-icon" id="main-icon"><span class="material-symbols-outlined icon-gradient-gold">gavel</span></div>
-                    <div class="nav-text" id="main-text">PENAL<br>CODES</div>
-                    <button class="nav-dropdown-btn" onclick="toggleDropdown(event)" title="Select Service">
-                        <span class="main-department-name">Select Service</span>
-                        <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle;">expand_more</span>
-                    </button>
-                    <div class="nav-dropdown-menu" id="service-dropdown"></div>
+                <!-- 2: Comms & Radio 10-Codes -->
+                <div class="tactical-card" onclick="openModal('modal-radio')">
+                    <div class="card-glow glow-blue"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-blue">DISPATCH</span>
+                        <span class="card-tag">RAD-02</span>
+                    </div>
+                    <div class="card-icon-wrap icon-blue">
+                        <span class="material-symbols-outlined icon-gradient-blue">podcasts</span>
+                    </div>
+                    <h3 class="card-title">COMMS &amp; 10-CODES</h3>
+                    <p class="card-desc">Tactical 10-codes, inter-department comms (/d), panic panic callouts and status transmissions.</p>
+                    <div class="card-footer-action">
+                        <span>Open Comms</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
                 </div>
-                <div class="nav-item-grid" id="secondary-grid"></div>
+
+                <!-- 3: Penal Code Engine -->
+                <div class="tactical-card highlight-card" onclick="openModal('modal-penal')">
+                    <div class="card-glow glow-gold"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-gold">CALCULATOR</span>
+                        <span class="card-tag">PEN-03</span>
+                    </div>
+                    <div class="card-icon-wrap icon-gold">
+                        <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
+                    </div>
+                    <h3 class="card-title">PENAL CODE ENGINE</h3>
+                    <p class="card-desc">Search 135+ offenses with instant fine sums, prison sentence totals, bail clearance &amp; PDA formatting.</p>
+                    <div class="card-footer-action">
+                        <span>Launch Engine</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 4: Arrest & 25-Min Custody -->
+                <div class="tactical-card" onclick="openModal('modal-arrest')">
+                    <div class="card-glow glow-emerald"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-emerald">DETENTION</span>
+                        <span class="card-tag">ARR-04</span>
+                    </div>
+                    <div class="card-icon-wrap icon-emerald">
+                        <span class="material-symbols-outlined icon-gradient-emerald">lock_clock</span>
+                    </div>
+                    <h3 class="card-title">ARREST &amp; 25-MIN TIMER</h3>
+                    <p class="card-desc">25-minute detention countdown, Miranda warning, lawyer pause locks, sub-timers &amp; booking RP.</p>
+                    <div class="card-footer-action">
+                        <span>Open Custody</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 5: Traffic Codes & Impound -->
+                <div class="tactical-card highlight-card" onclick="openModal('modal-traffic')">
+                    <div class="card-glow glow-cyan"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-cyan">ENGINE</span>
+                        <span class="card-tag">TRF-05</span>
+                    </div>
+                    <div class="card-icon-wrap icon-cyan">
+                        <span class="material-symbols-outlined icon-gradient-cyan">speed</span>
+                    </div>
+                    <h3 class="card-title">TRAFFIC CODES ENGINE</h3>
+                    <p class="card-desc">Interactive traffic offenses, live fine &amp; prison calculators, tow matrix, speed limits &amp; PDA formatting.</p>
+                    <div class="card-footer-action">
+                        <span>Launch Engine</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 6: Dress Codes & Rank Uniforms -->
+                <div class="tactical-card" onclick="openModal('modal-dresscodes')">
+                    <div class="card-glow glow-amber"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-amber">INSPECTION</span>
+                        <span class="card-tag">UNI-06</span>
+                    </div>
+                    <div class="card-icon-wrap icon-amber">
+                        <span class="material-symbols-outlined icon-gradient-amber">apparel</span>
+                    </div>
+                    <h3 class="card-title">DRESS CODES &amp; RANKS</h3>
+                    <p class="card-desc">Uniform guidelines for Cadets, Patrol, Detectives, SWAT tactical loadouts &amp; High Command dress.</p>
+                    <div class="card-footer-action">
+                        <span>View Uniforms</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 7: RP & HR Commands -->
+                <div class="tactical-card" onclick="openModal('modal-roleplay')">
+                    <div class="card-glow glow-purple"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-purple">ROLEPLAY</span>
+                        <span class="card-tag">CMD-07</span>
+                    </div>
+                    <div class="card-icon-wrap icon-purple">
+                        <span class="material-symbols-outlined icon-gradient-purple">psychology</span>
+                    </div>
+                    <h3 class="card-title">RP &amp; HR COMMANDS</h3>
+                    <p class="card-desc">Complete /me, /do, /try, /todo emotes, weapon checks, breathalyzers, search &amp; frisk RP actions.</p>
+                    <div class="card-footer-action">
+                        <span>View Commands</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 8: Article 7 Parking Map -->
+                <div class="tactical-card" onclick="openModal('modal-article7')">
+                    <div class="card-glow glow-teal"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-teal">TOWING</span>
+                        <span class="card-tag">PRK-08</span>
+                    </div>
+                    <div class="card-icon-wrap icon-teal">
+                        <span class="material-symbols-outlined icon-gradient-emerald">local_parking</span>
+                    </div>
+                    <h3 class="card-title">ARTICLE 7 PARKING</h3>
+                    <p class="card-desc">Downtown red-zone curbs, Mission Row tow boundaries, valid impound proof requirements &amp; maps.</p>
+                    <div class="card-footer-action">
+                        <span>View Parking</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 9: §2.4 Prohibited Items -->
+                <div class="tactical-card" onclick="openModal('modal-prohibited')">
+                    <div class="card-glow glow-rose"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-rose">CONTRABAND</span>
+                        <span class="card-tag">SEC-09</span>
+                    </div>
+                    <div class="card-icon-wrap icon-rose">
+                        <span class="material-symbols-outlined icon-gradient-rose">block</span>
+                    </div>
+                    <h3 class="card-title">PROHIBITED ITEMS (§2.4)</h3>
+                    <p class="card-desc">Class 1 &amp; Class 2 weapon restrictions, illegal narcotics threshold, body armor &amp; confiscation logs.</p>
+                    <div class="card-footer-action">
+                        <span>Inspect Items</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 10: Quick Officer Notepad -->
+                <div class="tactical-card" onclick="openModal('modal-notes')">
+                    <div class="card-glow glow-amber"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-amber">AUTO-SAVE</span>
+                        <span class="card-tag">NOT-10</span>
+                    </div>
+                    <div class="card-icon-wrap icon-amber">
+                        <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
+                    </div>
+                    <h3 class="card-title">FIELD NOTEPAD</h3>
+                    <p class="card-desc">Real-time persistent field scratchpad for license plates, suspect IDs, dispatch notes &amp; arrest drafts.</p>
+                    <div class="card-footer-action">
+                        <span>Open Notepad</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 11: MDT Settings & Config -->
+                <div class="tactical-card" onclick="openModal('modal-settings')">
+                    <div class="card-glow glow-slate"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-slate">CONFIG</span>
+                        <span class="card-tag">CFG-11</span>
+                    </div>
+                    <div class="card-icon-wrap icon-slate">
+                        <span class="material-symbols-outlined icon-gradient-slate">tune</span>
+                    </div>
+                    <h3 class="card-title">SETTINGS &amp; PROFILES</h3>
+                    <p class="card-desc">Officer callsign &amp; badge, skip boot screen toggle, Discord routing channels, backup &amp; baselines.</p>
+                    <div class="card-footer-action">
+                        <span>Open Settings</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
+
+                <!-- 12: About SAHP / Manual -->
+                <div class="tactical-card" onclick="openAboutTeam()">
+                    <div class="card-glow glow-gold"></div>
+                    <div class="card-header-bar">
+                        <span class="card-badge badge-gold">DEPARTMENT</span>
+                        <span class="card-tag">MAN-12</span>
+                    </div>
+                    <div class="card-icon-wrap icon-gold">
+                        <span class="material-symbols-outlined icon-gradient-gold">local_police</span>
+                    </div>
+                    <h3 class="card-title">ABOUT SAHP COMMAND</h3>
+                    <p class="card-desc">Official EN3 Highway Patrol guidelines, state jurisdiction values, chain of command &amp; reference manual.</p>
+                    <div class="card-footer-action">
+                        <span>Department Info</span>
+                        <span class="material-symbols-outlined action-arrow">arrow_forward</span>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
 
         <!-- =====================================================
              MODALS OVERLAY
@@ -1748,39 +1940,35 @@ Do you understand the rights I just read to you?"
 
         </div> <!-- End of modalOverlay -->
 
-        <!-- GROUPED FLOATING ACTION BUTTONS (Group FABs) -->
-        <aside class="fab-group" id="fab-group" aria-label="Quick Access Actions">
-            <button class="fab-btn" onclick="openModal('modal-notes')" title="Field Notepad" aria-label="Field Notepad">
+        <!-- CONSOLIDATED TACTICAL FLOATING DOCK -->
+        <div class="tactical-dock" id="tactical-dock">
+            <button class="dock-btn" onclick="openModal('modal-notes')" title="Quick Field Notepad" aria-label="Quick Notepad">
                 <span class="material-symbols-outlined icon-gradient-amber">edit_note</span>
-                <span class="fab-tooltip">Field Notepad</span>
+                <span class="dock-tooltip">Notepad</span>
             </button>
-            <button class="fab-btn" onclick="openModal('modal-arrest')" title="25-Min Custody Timer" aria-label="Custody Timer">
-                <span class="material-symbols-outlined icon-gradient-rose">timer</span>
-                <span id="dock-arrest-val" class="fab-badge hidden">25:00</span>
-                <span class="fab-tooltip">Custody Timer</span>
-            </button>
-            <button class="fab-btn" onclick="openModal('modal-penal')" title="Penal Code &amp; Citations" aria-label="Penal Codes">
+            <button class="dock-btn" onclick="openModal('modal-penal')" title="Penal Code &amp; Citation Calculator" aria-label="Penal Calculator">
                 <span class="material-symbols-outlined icon-gradient-gold">gavel</span>
-                <span class="fab-tooltip">Penal Engine</span>
+                <span class="dock-tooltip">Penal Engine</span>
             </button>
-            <button class="fab-btn" id="dock-audio-btn" onclick="window.app.toggleAudio()" title="MDT Audio FX" aria-label="Toggle Audio">
+            <button class="dock-btn" onclick="openModal('modal-arrest')" title="25-Min Custody Timer" aria-label="Arrest Timer">
+                <span class="material-symbols-outlined icon-gradient-rose">lock_clock</span>
+                <span id="dock-arrest-val" class="dock-badge hidden">25:00</span>
+                <span class="dock-tooltip">Custody Timer</span>
+            </button>
+            <button class="dock-btn" id="dock-audio-btn" onclick="window.app.toggleAudio()" title="MDT Audio FX" aria-label="Toggle Audio">
                 <span class="material-symbols-outlined" id="dock-audio-icon" style="color: #38bdf8;">volume_up</span>
-                <span class="fab-tooltip">Audio FX</span>
+                <span class="dock-tooltip">Audio FX</span>
             </button>
-            <button class="fab-btn" onclick="openModal('modal-settings')" title="Settings &amp; Configuration" aria-label="Settings">
-                <span class="material-symbols-outlined icon-gradient-slate">settings</span>
-                <span class="fab-tooltip">Settings</span>
+            <button class="dock-btn dock-badge-btn" onclick="openAboutTeam()" title="SAHP Command &amp; Manual" aria-label="About SAHP">
+                <img src="SAHP-LOGO.png" alt="SAHP" class="dock-sahp-logo">
+                <span class="dock-tooltip">About SAHP</span>
             </button>
-            <button class="fab-btn fab-badge-btn" onclick="openAboutTeam()" title="About SAHP Command" aria-label="About SAHP">
-                <img src="SAHP-LOGO.png" alt="SAHP" class="fab-sahp-logo">
-                <span class="fab-tooltip">About SAHP</span>
-            </button>
-        </aside>
+        </div>
 
     </div> <!-- End of app-container -->
 
     <!-- FULL PAGE: ABOUT SAHP COMPANION SECTION -->
-    <div id="about-team-page" class="modal-overlay" style="z-index: 10000;" role="dialog" aria-modal="true">
+    <div id="about-team-page" class="modal-overlay" style="z-index: 1000;" role="dialog" aria-modal="true">
         <div class="modal-content" style="max-width: 800px; display:flex;">
             <div class="modal-header">
                 <span style="display:flex; align-items:center; gap:8px;">

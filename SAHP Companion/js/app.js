@@ -482,24 +482,41 @@
         const ic = getICTime();
         const local = getLocalTime();
 
-        const bigClockEl = document.getElementById('big-live-clock');
-        if (bigClockEl) {
-            bigClockEl.innerHTML = `
-                <div class="hud-clock-group">
-                    <div class="hud-clock-card ic-card" title="In-City Time (UTC+2)">
-                        <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">schedule</span> IC TIME</div>
-                        <div class="hud-clock-digits ic-digits">${ic.formattedFull}</div>
+        let icDigits = document.querySelector('#big-live-clock .ic-digits');
+        let localDigits = document.querySelector('#big-live-clock .local-digits');
+
+        if (!icDigits || !localDigits) {
+            const bigClockEl = document.getElementById('big-live-clock');
+            if (bigClockEl) {
+                bigClockEl.innerHTML = `
+                    <div class="hud-clock-group">
+                        <div class="hud-clock-card ic-card" title="In-City Time (UTC+2)">
+                            <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">schedule</span> IC TIME</div>
+                            <div class="hud-clock-digits ic-digits">${ic.formattedFull}</div>
+                        </div>
+                        <div class="hud-clock-card local-card" title="Local System Time">
+                            <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">public</span> LOCAL TIME</div>
+                            <div class="hud-clock-digits local-digits">${local.formattedFull}</div>
+                        </div>
                     </div>
-                    <div class="hud-clock-card local-card" title="Local System Time">
-                        <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">public</span> LOCAL TIME</div>
-                        <div class="hud-clock-digits local-digits">${local.formattedFull}</div>
-                    </div>
-                </div>
-            `;
+                `;
+            }
+        } else {
+            if (icDigits.textContent !== ic.formattedFull) {
+                icDigits.textContent = ic.formattedFull;
+            }
+            if (localDigits.textContent !== local.formattedFull) {
+                localDigits.textContent = local.formattedFull;
+            }
         }
 
         const bcLiveTime = document.getElementById('bc-live-time');
-        if (bcLiveTime) bcLiveTime.textContent = `${ic.formattedTime} (IC) | ${local.formattedTime} (Local)`;
+        if (bcLiveTime) {
+            const bcText = `${ic.formattedTime} (IC) | ${local.formattedTime} (Local)`;
+            if (bcLiveTime.textContent !== bcText) {
+                bcLiveTime.textContent = bcText;
+            }
+        }
 
         if (state.dutyStartTime) {
             updateShiftTimerDisplay();
@@ -894,7 +911,7 @@
         }
 
         container.innerHTML = filtered.map(item => {
-            const isSelected = state.selectedCharges.some(c => c.code === item.code);
+            const isSelected = (state.selectedCharges || []).some(c => (c.code || c) === item.code);
             return `
                 <div class="penal-row ${isSelected ? 'selected' : ''}" onclick="window.app.toggleSelectCharge('${item.code}')">
                     <span class="penal-badge-code">${item.code}</span>
@@ -917,7 +934,7 @@
         const codeObj = dataObj.penalCodes.find(c => c.code === codeStr);
         if (!codeObj) return;
 
-        const idx = state.selectedCharges.findIndex(c => c.code === codeStr);
+        if (!Array.isArray(state.selectedCharges)) state.selectedCharges = []; const idx = state.selectedCharges.findIndex(c => (c.code || c) === codeStr);
         if (idx !== -1) {
             state.selectedCharges.splice(idx, 1);
         } else {
@@ -1080,7 +1097,7 @@
         const selectedList = state.selectedTrafficCharges || [];
 
         container.innerHTML = filtered.map(item => {
-            const isSelected = selectedList.some(c => c.code === item.code);
+            const isSelected = (selectedList || []).some(c => (c.code || c) === item.code);
             const starsDisplay = item.stars && item.stars !== '-' ? item.stars : '-';
 
             let bailOrTowBadge = '';
@@ -1638,6 +1655,10 @@
         },
         calculateImpoundFee,
         renderTrafficCodes,
+        setPenalCategoryFilter: (cat) => {
+            currentCategoryFilter = cat;
+            renderPenalCodes();
+        },
         renderPenalCodes,
         openDiscordChannel,
         copyQuickNotes,
@@ -1661,8 +1682,8 @@
         updateTrafficCitationSummary();
         updateDefaultsBadge();
 
-        // Update live clocks every 500ms
-        setInterval(updateLiveClocks, 500);
+        // Update live clocks every 1000ms (1s)
+        setInterval(updateLiveClocks, 1000);
         updateLiveClocks();
 
         // Setup import file listener
@@ -1671,21 +1692,29 @@
             importInput.addEventListener('change', handleImportDbFile);
         }
 
-        // Search penal codes listener
+        // Search penal codes listener with debounce
         const searchInput = document.getElementById('penal-search-input');
         if (searchInput) {
+            let penalSearchDebounce = null;
             searchInput.addEventListener('input', (e) => {
                 searchQuery = e.target.value.trim();
-                renderPenalCodes();
+                if (penalSearchDebounce) clearTimeout(penalSearchDebounce);
+                penalSearchDebounce = setTimeout(() => {
+                    renderPenalCodes();
+                }, 75);
             });
         }
 
-        // Search traffic codes listener
+        // Search traffic codes listener with debounce
         const trafficSearchInput = document.getElementById('traffic-search-input');
         if (trafficSearchInput) {
+            let trafficSearchDebounce = null;
             trafficSearchInput.addEventListener('input', (e) => {
                 searchTrafficQuery = e.target.value.trim();
-                renderTrafficCodes();
+                if (trafficSearchDebounce) clearTimeout(trafficSearchDebounce);
+                trafficSearchDebounce = setTimeout(() => {
+                    renderTrafficCodes();
+                }, 75);
             });
         }
     });
@@ -1703,6 +1732,9 @@ function openModal(modalId) {
     if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
         window.soundSystem.playRadioClick();
     }
+
+    overlay.classList.remove('closing');
+    modal.classList.remove('closing');
     overlay.classList.add('active');
     modal.classList.add('active');
 }
@@ -1714,8 +1746,20 @@ function closeModals() {
     if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
         window.soundSystem.playRadioClick();
     }
-    overlay.classList.remove('active');
-    document.querySelectorAll('.modal-content').forEach(m => m.classList.remove('active'));
+
+    const activeModals = document.querySelectorAll('#modalOverlay .modal-content.active');
+    if (activeModals.length === 0) {
+        overlay.classList.remove('active', 'closing');
+        return;
+    }
+
+    overlay.classList.add('closing');
+    activeModals.forEach(m => m.classList.add('closing'));
+
+    setTimeout(() => {
+        overlay.classList.remove('active', 'closing');
+        activeModals.forEach(m => m.classList.remove('active', 'closing'));
+    }, 180);
 }
 
 function switchTab(btn, tabId) {
@@ -1851,7 +1895,13 @@ function copySimple(text) {
 function openAboutTeam() {
     const page = document.getElementById('about-team-page');
     if (page) {
-        page.classList.remove('hidden');
+        page.classList.remove('closing');
+        page.classList.add('active');
+        const modal = page.querySelector('.modal-content');
+        if (modal) {
+            modal.classList.remove('closing');
+            modal.classList.add('active');
+        }
         if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
             window.soundSystem.playDutyChime();
         }
@@ -1861,10 +1911,17 @@ function openAboutTeam() {
 function closeAboutTeam() {
     const page = document.getElementById('about-team-page');
     if (page) {
-        page.classList.add('hidden');
         if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
             window.soundSystem.playRadioClick();
         }
+        page.classList.add('closing');
+        const modal = page.querySelector('.modal-content');
+        if (modal) modal.classList.add('closing');
+
+        setTimeout(() => {
+            page.classList.remove('active', 'closing');
+            if (modal) modal.classList.remove('active', 'closing');
+        }, 180);
     }
 }
 
