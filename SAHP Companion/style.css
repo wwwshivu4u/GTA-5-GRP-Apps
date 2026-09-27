@@ -436,6 +436,7 @@ body::before {
     -webkit-overflow-scrolling: touch;
     contain: content;
     will-change: scroll-position;
+    z-index: 10;
 }
 
 .dashboard-main::-webkit-scrollbar {
@@ -1159,7 +1160,7 @@ body::before {
 
 .grid-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    /* grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); */
     gap: 0.8rem;
 }
 
