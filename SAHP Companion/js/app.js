@@ -1619,123 +1619,16 @@
     // 6. MODAL MANAGER (EMS Companion Architecture)
     // -----------------------------------------------------
     class ModalManager {
-        constructor() {
-            this.overlay = null;
-            this.activeModal = null;
-            this.modalBehindNotes = null;
-            this.closeTimeout = null;
-        }
-
-        init() {
-            this.overlay = document.getElementById('modalOverlay');
-            if (!this.overlay) return;
-
-            // Clicking backdrop outside modal-content closes active modal
-            this.overlay.addEventListener('click', (e) => {
-                if (e.target === this.overlay) {
-                    this.closeAll();
-                }
-            });
-        }
-
+        constructor() {}
+        init() {}
         open(modalId) {
-            if (modalId === 'modal-traffic') {
-                modalId = 'modal-penal';
-                switchLegalEngineTab('traffic');
-            }
-
-            if (this.closeTimeout) {
-                clearTimeout(this.closeTimeout);
-                this.closeTimeout = null;
-            }
-
-            if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
-            if (this.overlay) {
-                this.overlay.classList.remove('closing');
-                this.overlay.classList.add('active');
-            }
-
-            if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
-                window.soundSystem.playRadioClick();
-            }
-
-            if (modalId === 'modal-notes') {
-                const currentActive = (this.activeModal && this.activeModal.id !== 'modal-notes')
-                    ? this.activeModal
-                    : document.querySelector('.modal-content.active:not(#modal-notes)');
-                if (currentActive) {
-                    this.modalBehindNotes = currentActive;
-                    currentActive.classList.add('in-background');
-                }
-                document.querySelectorAll('.modal-content').forEach(m => {
-                    if (m.id !== modalId && m !== this.modalBehindNotes) {
-                        m.classList.remove('active', 'closing', 'in-background');
-                    }
-                });
-            } else {
-                if (this.modalBehindNotes) {
-                    this.modalBehindNotes.classList.remove('in-background');
-                    this.modalBehindNotes = null;
-                }
-                document.querySelectorAll('.modal-content').forEach(m => {
-                    if (m.id !== modalId) {
-                        m.classList.remove('active', 'closing', 'in-background');
-                    }
-                });
-            }
-
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('closing', 'in-background');
-                modal.classList.add('active');
-                this.activeModal = modal;
-            }
+            openModal(modalId);
         }
-
         closeAll() {
-            if (!this.overlay) this.overlay = document.getElementById('modalOverlay');
-            if (!this.overlay || !this.overlay.classList.contains('active')) return;
-
-            if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
-                window.soundSystem.playRadioClick();
-            }
-
-            // If Quick Notes is open above a background modal, close only Quick Notes and restore background modal
-            const notesModal = document.getElementById('modal-notes');
-            if (notesModal && notesModal.classList.contains('active') && this.modalBehindNotes) {
-                notesModal.classList.add('closing');
-                const bgModal = this.modalBehindNotes;
-                this.modalBehindNotes = null;
-
-                setTimeout(() => {
-                    notesModal.classList.remove('active', 'closing');
-                    if (bgModal) {
-                        bgModal.classList.remove('in-background');
-                        this.activeModal = bgModal;
-                    }
-                }, 200);
-                return;
-            }
-
-            const activeModals = document.querySelectorAll('.modal-content.active, .sub-modal.active');
-            if (activeModals.length === 0) {
-                this.overlay.classList.remove('active', 'closing');
-                return;
-            }
-
-            this.overlay.classList.add('closing');
-            activeModals.forEach(m => m.classList.add('closing'));
-
-            if (this.closeTimeout) clearTimeout(this.closeTimeout);
-            this.closeTimeout = setTimeout(() => {
-                if (this.overlay) {
-                    this.overlay.classList.remove('active', 'closing');
-                }
-                activeModals.forEach(m => m.classList.remove('active', 'closing', 'in-background'));
-                this.activeModal = null;
-                this.modalBehindNotes = null;
-                this.closeTimeout = null;
-            }, 230);
+            closeAllModals();
+        }
+        close(modalId) {
+            closeModals(modalId);
         }
     }
 
@@ -1867,6 +1760,8 @@
 // -----------------------------------------------------
 // 16. MODAL HELPERS & GLOBAL UI EVENT WRAPPERS
 // -----------------------------------------------------
+let modalStack = [];
+
 function openModal(modalId) {
     if (modalId === 'modal-traffic') {
         modalId = 'modal-penal';
@@ -1883,12 +1778,145 @@ function openModal(modalId) {
     }
 
     overlay.classList.remove('closing');
-    modal.classList.remove('closing');
     overlay.classList.add('active');
+
+    // Manage modalStack
+    if (modalId === 'modal-more') {
+        if (!modalStack.includes('modal-more')) {
+            // Opening More fresh: dismiss any unrelated active modals
+            document.querySelectorAll('#modalOverlay .modal-content.active').forEach(m => {
+                if (m.id !== 'modal-more') {
+                    m.classList.remove('active', 'closing', 'modal-stacked-active', 'modal-stacked-behind');
+                    m.style.transform = '';
+                    m.style.opacity = '';
+                    m.style.filter = '';
+                    m.style.zIndex = '';
+                    m.style.boxShadow = '';
+                }
+            });
+            modalStack = ['modal-more'];
+        } else {
+            // Already has modal-more in stack; bring to top
+            const idx = modalStack.indexOf('modal-more');
+            modalStack.splice(idx, 1);
+            modalStack.push('modal-more');
+        }
+    } else if (modalStack.includes('modal-more')) {
+        // Parent "More" is open: stack this submodal on top of the stack!
+        const existingIdx = modalStack.indexOf(modalId);
+        if (existingIdx !== -1) {
+            modalStack.splice(existingIdx, 1);
+        }
+        modalStack.push(modalId);
+    } else {
+        // More is not in the stack: direct modal opening from dashboard/FAB
+        document.querySelectorAll('#modalOverlay .modal-content.active').forEach(m => {
+            if (m.id !== modalId) {
+                m.classList.remove('active', 'closing', 'modal-stacked-active', 'modal-stacked-behind');
+                m.style.transform = '';
+                m.style.opacity = '';
+                m.style.filter = '';
+                m.style.zIndex = '';
+                m.style.boxShadow = '';
+            }
+        });
+        modalStack = [modalId];
+    }
+
+    modal.classList.remove('closing');
     modal.classList.add('active');
+
+    updateModalStackLayers();
 }
 
-function closeModals() {
+function updateModalStackLayers() {
+    const total = modalStack.length;
+    if (total === 0) return;
+
+    modalStack.forEach((id, index) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        const depth = (total - 1) - index; // 0 is top-most active
+        el.classList.add('active');
+        el.classList.remove('closing');
+
+        // zIndex increases with stack position
+        const zIndex = 10010 + index * 10;
+        el.style.zIndex = zIndex.toString();
+
+        if (depth === 0) {
+            // Active top modal
+            el.classList.remove('modal-stacked-behind');
+            el.classList.add('modal-stacked-active');
+            el.style.transform = 'translate3d(0, 0, 0) scale(1)';
+            el.style.opacity = '1';
+            el.style.filter = 'none';
+            el.style.boxShadow = '0 25px 70px rgba(0, 0, 0, 0.95), 0 0 25px rgba(56, 189, 248, 0.25)';
+        } else {
+            // Layered behind modal
+            el.classList.remove('modal-stacked-active');
+            el.classList.add('modal-stacked-behind');
+
+            const translateY = -18 * depth;
+            const scale = Math.max(0.86, 1 - depth * 0.038);
+            const opacity = Math.max(0.42, 0.88 - depth * 0.14);
+            const blur = Math.min(2.5, depth * 0.7);
+
+            el.style.transform = `translate3d(0, ${translateY}px, 0) scale(${scale})`;
+            el.style.opacity = opacity.toString();
+            el.style.filter = `blur(${blur}px) brightness(${Math.max(0.75, 0.92 - depth * 0.05)})`;
+            el.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.8)';
+        }
+    });
+}
+
+function closeSpecificModal(modalId) {
+    if (typeof modalId !== 'string') {
+        if (modalId && modalId.id) modalId = modalId.id;
+    }
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+        window.soundSystem.playRadioClick();
+    }
+
+    const idx = modalStack.indexOf(modalId);
+    if (idx !== -1) {
+        modalStack.splice(idx, 1);
+    }
+
+    modal.classList.add('closing');
+
+    if (modalStack.length === 0) {
+        const overlay = document.getElementById('modalOverlay');
+        if (overlay) overlay.classList.add('closing');
+        setTimeout(() => {
+            if (overlay) overlay.classList.remove('active', 'closing');
+            modal.classList.remove('active', 'closing', 'modal-stacked-active', 'modal-stacked-behind');
+            modal.style.transform = '';
+            modal.style.opacity = '';
+            modal.style.filter = '';
+            modal.style.zIndex = '';
+            modal.style.boxShadow = '';
+        }, 180);
+        return;
+    }
+
+    setTimeout(() => {
+        modal.classList.remove('active', 'closing', 'modal-stacked-active', 'modal-stacked-behind');
+        modal.style.transform = '';
+        modal.style.opacity = '';
+        modal.style.filter = '';
+        modal.style.zIndex = '';
+        modal.style.boxShadow = '';
+    }, 180);
+
+    updateModalStackLayers();
+}
+
+function closeAllModals() {
     const overlay = document.getElementById('modalOverlay');
     if (!overlay) return;
 
@@ -1899,16 +1927,82 @@ function closeModals() {
     const activeModals = document.querySelectorAll('#modalOverlay .modal-content.active');
     if (activeModals.length === 0) {
         overlay.classList.remove('active', 'closing');
+        modalStack = [];
         return;
     }
 
     overlay.classList.add('closing');
-    activeModals.forEach(m => m.classList.add('closing'));
+    activeModals.forEach(m => {
+        m.classList.add('closing');
+        m.classList.remove('modal-stacked-active', 'modal-stacked-behind');
+    });
+
+    modalStack = [];
 
     setTimeout(() => {
         overlay.classList.remove('active', 'closing');
-        activeModals.forEach(m => m.classList.remove('active', 'closing'));
+        activeModals.forEach(m => {
+            m.classList.remove('active', 'closing');
+            m.style.transform = '';
+            m.style.opacity = '';
+            m.style.filter = '';
+            m.style.zIndex = '';
+            m.style.boxShadow = '';
+        });
     }, 180);
+}
+
+function closeModals(targetModal) {
+    if (window.event && !targetModal) {
+        const parentModal = window.event.target.closest('.modal-content');
+        if (parentModal && parentModal.id) {
+            targetModal = parentModal.id;
+        }
+    }
+    if (targetModal && typeof targetModal === 'string') {
+        closeSpecificModal(targetModal);
+        return;
+    }
+    if (modalStack.length > 1) {
+        closeSpecificModal(modalStack[modalStack.length - 1]);
+    } else {
+        closeAllModals();
+    }
+}
+
+function handleBackdropClick() {
+    if (modalStack.length === 0) {
+        closeAllModals();
+        return;
+    }
+
+    const hasMore = modalStack.includes('modal-more');
+    if (hasMore) {
+        // Find submodals (any modal in stack other than modal-more)
+        const subModals = modalStack.filter(id => id !== 'modal-more');
+        if (subModals.length > 0) {
+            // Dismiss top submodal first
+            let targetToClose = modalStack[modalStack.length - 1];
+            if (targetToClose === 'modal-more') {
+                targetToClose = subModals[subModals.length - 1];
+            }
+            closeSpecificModal(targetToClose);
+            return;
+        } else {
+            // No submodals active, only modal-more is open -> close modal-more
+            closeAllModals();
+            return;
+        }
+    }
+
+    // If modal-more is not in the stack
+    if (modalStack.length > 1) {
+        const topId = modalStack[modalStack.length - 1];
+        closeSpecificModal(topId);
+        return;
+    }
+
+    closeAllModals();
 }
 
 function switchTab(btn, tabId) {
@@ -2079,38 +2173,15 @@ function copySimple(text) {
 }
 
 function openAboutTeam() {
-    const page = document.getElementById('about-team-page');
-    if (page) {
-        page.classList.remove('closing');
-        page.classList.add('active');
-        const modal = page.querySelector('.modal-content');
-        if (modal) {
-            modal.classList.remove('closing');
-            modal.classList.add('active');
-        }
-        if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
-            window.soundSystem.playDutyChime();
-        }
+    openModal('modal-about');
+    if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+        window.soundSystem.playDutyChime();
     }
 }
 
 function closeAboutTeam() {
-    const page = document.getElementById('about-team-page');
-    if (page) {
-        if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
-            window.soundSystem.playRadioClick();
-        }
-        page.classList.add('closing');
-        const modal = page.querySelector('.modal-content');
-        if (modal) modal.classList.add('closing');
-
-        setTimeout(() => {
-            page.classList.remove('active', 'closing');
-            if (modal) modal.classList.remove('active', 'closing');
-        }, 180);
-    }
+    closeModals('modal-about');
 }
-
 
 window.toggleDropdown = function(e) {
     if (window.app && window.app.toggleDropdown) {
@@ -2130,6 +2201,30 @@ document.addEventListener('click', (e) => {
     }
 });
 
+// Click on layered behind modal brings it to top
+document.addEventListener('click', (e) => {
+    const behindModal = e.target.closest('.modal-content.modal-stacked-behind');
+    if (behindModal && behindModal.id && modalStack.includes(behindModal.id)) {
+        e.stopPropagation();
+        e.preventDefault();
+        const idx = modalStack.indexOf(behindModal.id);
+        if (idx !== -1) {
+            modalStack.splice(idx, 1);
+            modalStack.push(behindModal.id);
+            updateModalStackLayers();
+            if (window.soundSystem && (!window.app || window.app.state.soundEnabled !== false)) {
+                window.soundSystem.playRadioClick();
+            }
+        }
+    }
+}, true);
+
+// Escape key dismisses modals sequentially
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalStack.length > 0) {
+        handleBackdropClick();
+    }
+});
 
 // Backdrop click listeners to close modal when clicking outside
 document.addEventListener('DOMContentLoaded', () => {
@@ -2137,16 +2232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (overlay) {
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) {
-                closeModals();
-            }
-        });
-    }
-
-    const aboutPage = document.getElementById('about-team-page');
-    if (aboutPage) {
-        aboutPage.addEventListener('click', (e) => {
-            if (e.target === aboutPage) {
-                closeAboutTeam();
+                handleBackdropClick();
             }
         });
     }

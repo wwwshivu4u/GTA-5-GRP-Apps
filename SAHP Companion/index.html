@@ -1858,7 +1858,7 @@ Do you understand the rights I just read to you?"
                 <div class="modal-body-scroll">
                     <div class="more-tools-grid">
                         <!-- Tool 1: Arrest 25-Min Timer -->
-                        <div class="tactical-card" onclick="closeModals(); openModal('modal-arrest');">
+                        <div class="tactical-card" onclick="openModal('modal-arrest');">
                             <div class="card-glow glow-rose"></div>
                             <div class="card-header-bar">
                                 <span class="card-badge badge-rose">CUSTODY</span>
@@ -1876,7 +1876,7 @@ Do you understand the rights I just read to you?"
                         </div>
 
                         <!-- Tool 2: Uniform & Dress Codes -->
-                        <div class="tactical-card" onclick="closeModals(); openModal('modal-dresscodes');">
+                        <div class="tactical-card" onclick="openModal('modal-dresscodes');">
                             <div class="card-glow glow-gold"></div>
                             <div class="card-header-bar">
                                 <span class="card-badge badge-gold">UNIFORM</span>
@@ -1894,7 +1894,7 @@ Do you understand the rights I just read to you?"
                         </div>
 
                         <!-- Tool 3: Article 7 Parking Regulations -->
-                        <div class="tactical-card" onclick="closeModals(); openModal('modal-article7');">
+                        <div class="tactical-card" onclick="openModal('modal-article7');">
                             <div class="card-glow glow-emerald"></div>
                             <div class="card-header-bar">
                                 <span class="card-badge badge-emerald">PARKING</span>
@@ -1912,7 +1912,7 @@ Do you understand the rights I just read to you?"
                         </div>
 
                         <!-- Tool 4: Prohibited Items (§2.4) -->
-                        <div class="tactical-card" onclick="closeModals(); openModal('modal-prohibited');">
+                        <div class="tactical-card" onclick="openModal('modal-prohibited');">
                             <div class="card-glow glow-rose"></div>
                             <div class="card-header-bar">
                                 <span class="card-badge badge-rose">LEGAL</span>
@@ -1930,7 +1930,7 @@ Do you understand the rights I just read to you?"
                         </div>
 
                         <!-- Tool 5: Field Notepad -->
-                        <div class="tactical-card" onclick="closeModals(); openModal('modal-notes');">
+                        <div class="tactical-card" onclick="openModal('modal-notes');">
                             <div class="card-glow glow-amber"></div>
                             <div class="card-header-bar">
                                 <span class="card-badge badge-amber">RECORDS</span>
@@ -1948,7 +1948,7 @@ Do you understand the rights I just read to you?"
                         </div>
 
                         <!-- Tool 6: Settings & Profile -->
-                        <div class="tactical-card" onclick="closeModals(); openModal('modal-settings');">
+                        <div class="tactical-card" onclick="openModal('modal-settings');">
                             <div class="card-glow glow-cyan"></div>
                             <div class="card-header-bar">
                                 <span class="card-badge badge-cyan">SYSTEM</span>
@@ -1966,7 +1966,7 @@ Do you understand the rights I just read to you?"
                         </div>
 
                         <!-- Tool 7: About SAHP Companion -->
-                        <div class="tactical-card" onclick="closeModals(); openAboutTeam();">
+                        <div class="tactical-card" onclick="openModal('modal-about');">
                             <div class="card-glow glow-gold"></div>
                             <div class="card-header-bar">
                                 <span class="card-badge badge-gold">MANUAL</span>
@@ -1982,6 +1982,29 @@ Do you understand the rights I just read to you?"
                                 <span class="material-symbols-outlined action-arrow">arrow_forward</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 11: ABOUT SAHP COMPANION SECTION -->
+            <div class="modal-content" id="modal-about" style="max-width: 800px;">
+                <div class="modal-header">
+                    <span style="display:flex; align-items:center; gap:8px;">
+                        <img src="SAHP-LOGO.png" alt="SAHP" style="width:28px; height:28px;">
+                        <span>San Andreas Highway Patrol - MDT Companion</span>
+                    </span>
+                    <button class="close-btn" onclick="closeModals('modal-about')"><span class="material-symbols-outlined" style="font-size:1.1rem;">close</span></button>
+                </div>
+                <div class="modal-body-scroll" style="text-align:center; padding: 2rem;">
+                    <img src="SAHP-LOGO.png" alt="SAHP Badge" style="width: 140px; height: 140px; margin: 0 auto 1.2rem; border-radius: 50%; box-shadow: 0 0 25px rgba(245,158,11,0.4);">
+                    <h2 style="font-size:1.5rem; font-weight:800; color:var(--text-main); margin-bottom:0.4rem;">SAHP TROOPER MDT COMPANION</h2>
+                    <div style="font-size:0.9rem; color:var(--secondary); font-weight:600; letter-spacing:1px; margin-bottom:1.2rem;">SAFETY AND SERVICE • TO PROTECT AND SERVE</div>
+                    <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.6; max-width:600px; margin:0 auto 1.5rem;">
+                        Built from the <strong>Official EN3 Highway Patrol Guide</strong>. Featuring full live Penal Code search (135+ codes), instant fine &amp; prison sentence calculators, in-game PDA citation text formatting, step-by-step 25-minute arrest countdown timer with lawyer pauses, traffic codes, Article 7 parking maps, bodycam sequences, and direct Discord channel integrations.
+                    </p>
+                    <div style="display:flex; justify-content:center; gap:1rem;">
+                        <button class="btn btn-primary" onclick="openModal('modal-penal');">Open Penal Code</button>
+                        <button class="btn btn-success" onclick="openModal('modal-arrest');">Open Arrest Timer</button>
                     </div>
                 </div>
             </div>
@@ -2007,38 +2030,13 @@ Do you understand the rights I just read to you?"
                 <span class="material-symbols-outlined" id="dock-audio-icon" style="color: #38bdf8;">volume_up</span>
                 <span class="dock-tooltip">Audio FX</span>
             </button>
-            <button class="dock-btn dock-badge-btn" onclick="openAboutTeam()" title="SAHP Command &amp; Manual" aria-label="About SAHP">
+            <button class="dock-btn dock-badge-btn" onclick="openModal('modal-about')" title="SAHP Command &amp; Manual" aria-label="About SAHP">
                 <img src="SAHP-LOGO.png" alt="SAHP" class="dock-sahp-logo">
                 <span class="dock-tooltip">About SAHP</span>
             </button>
         </div>
 
     </div> <!-- End of app-container -->
-
-    <!-- FULL PAGE: ABOUT SAHP COMPANION SECTION -->
-    <div id="about-team-page" class="modal-overlay" style="z-index: 1000;" role="dialog" aria-modal="true">
-        <div class="modal-content" style="max-width: 800px; display:flex;">
-            <div class="modal-header">
-                <span style="display:flex; align-items:center; gap:8px;">
-                    <img src="SAHP-LOGO.png" alt="SAHP" style="width:28px; height:28px;">
-                    <span>San Andreas Highway Patrol - MDT Companion</span>
-                </span>
-                <button class="close-btn" onclick="closeAboutTeam()"><span class="material-symbols-outlined">close</span></button>
-            </div>
-            <div class="modal-body-scroll" style="text-align:center; padding: 2rem;">
-                <img src="SAHP-LOGO.png" alt="SAHP Badge" style="width: 140px; height: 140px; margin: 0 auto 1.2rem; border-radius: 50%; box-shadow: 0 0 25px rgba(245,158,11,0.4);">
-                <h2 style="font-size:1.5rem; font-weight:800; color:var(--text-main); margin-bottom:0.4rem;">SAHP TROOPER MDT COMPANION</h2>
-                <div style="font-size:0.9rem; color:var(--secondary); font-weight:600; letter-spacing:1px; margin-bottom:1.2rem;">SAFETY AND SERVICE • TO PROTECT AND SERVE</div>
-                <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.6; max-width:600px; margin:0 auto 1.5rem;">
-                    Built from the <strong>Official EN3 Highway Patrol Guide</strong>. Featuring full live Penal Code search (135+ codes), instant fine &amp; prison sentence calculators, in-game PDA citation text formatting, step-by-step 25-minute arrest countdown timer with lawyer pauses, traffic codes, Article 7 parking maps, bodycam sequences, and direct Discord channel integrations.
-                </p>
-                <div style="display:flex; justify-content:center; gap:1rem;">
-                    <button class="btn btn-primary" onclick="closeAboutTeam(); openModal('modal-penal');">Open Penal Code</button>
-                    <button class="btn btn-success" onclick="closeAboutTeam(); openModal('modal-arrest');">Open Arrest Timer</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Tactical Notification Toast -->
     <div id="tactical-toast" class="tactical-toast">
