@@ -94,11 +94,12 @@
                 soundEnabled: true,
                 officerName: '',
                 badgeNum: '',
-                jobType: '',
+                jobType: 'Highway Patrol',
                 discordServerId: DEFAULT_DISCORD_SERVER_ID,
                 discordChannels: { ...DEFAULT_DISCORD_CHANNELS },
                 shiftRates: { ...DEFAULT_SHIFT_RATES },
                 dutySteps,
+                isOnDuty: false,
                 dutyStartTime: null,
                 selectedLocation: 'Patrol (Highway / Paleto)',
                 quickNotes: '',
@@ -137,6 +138,17 @@
                         }
                     };
                 }
+
+                // Dedicated persistent duty state recovery
+                const explicitDuty = localStorage.getItem('sahp_is_on_duty');
+                if (explicitDuty !== null) {
+                    this.state.isOnDuty = explicitDuty === '1';
+                    if (!this.state.isOnDuty) {
+                        this.state.dutyStartTime = null;
+                    }
+                } else if (this.state.dutyStartTime) {
+                    this.state.isOnDuty = true;
+                }
             } catch (err) {
                 console.error('Failed to load state from localStorage:', err);
                 this.state = this.getDefaultState();
@@ -147,6 +159,12 @@
         save() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+                localStorage.setItem('sahp_is_on_duty', this.state.isOnDuty ? '1' : '0');
+                if (this.state.dutyStartTime) {
+                    localStorage.setItem('sahp_duty_start_time', String(this.state.dutyStartTime));
+                } else {
+                    localStorage.removeItem('sahp_duty_start_time');
+                }
                 const statusEl = document.getElementById('notes-auto-save-status');
                 if (statusEl) {
                     statusEl.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">cloud_done</span> Auto-saved';
@@ -267,10 +285,14 @@
 
         // Job / Duty Assignment
         const topbarJob = document.getElementById('topbar-job-type');
-        if (topbarJob) topbarJob.value = state.jobType || '';
+        if (topbarJob) {
+            topbarJob.value = state.jobType || 'Highway Patrol';
+        }
 
         const settingJob = document.getElementById('settingJobType');
-        if (settingJob) settingJob.value = state.jobType || '';
+        if (settingJob) {
+            settingJob.value = state.jobType || 'Highway Patrol';
+        }
 
         updateOfficerTopBarBadge();
 
@@ -322,8 +344,16 @@
             updateNotepadCounts();
         }
 
-        // Duty Status
-        const isOnDuty = Boolean(state.dutyStartTime);
+        // Duty Status Persistence & UI Sync
+        const explicitDuty = localStorage.getItem('sahp_is_on_duty');
+        const isOnDuty = explicitDuty !== null ? explicitDuty === '1' : Boolean(state.isOnDuty || state.dutyStartTime);
+        state.isOnDuty = isOnDuty;
+        if (!isOnDuty) {
+            state.dutyStartTime = null;
+        } else if (!state.dutyStartTime) {
+            const savedTime = localStorage.getItem('sahp_duty_start_time');
+            state.dutyStartTime = savedTime ? parseInt(savedTime, 10) : Date.now();
+        }
         setDutyStatusUI(isOnDuty);
 
         // Bodycam step progression
@@ -466,20 +496,85 @@
     // -----------------------------------------------------
     // 5. CLOCKS & SHIFT ENGINE
     // -----------------------------------------------------
+    const usCurrencyFormatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0
+    });
+
+    function formatCurrency(val) {
+        if (val === undefined || val === null || val === '') return '$0';
+        if (typeof val === 'number') return usCurrencyFormatter.format(val);
+        const cleanStr = String(val).replace(/[^0-9.-]/g, '');
+        const num = parseFloat(cleanStr);
+        return isNaN(num) ? '$0' : usCurrencyFormatter.format(num);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function escapeForAttribute(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '&quot;');
+    }
+
     function getICTime() {
         const now = new Date();
-        const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
-        const icTotalMinutes = (utcMinutes + 120) % 1440; // UTC+2 In-Character Time
-        const icHours = Math.floor(icTotalMinutes / 60);
-        const icMins = Math.floor(icTotalMinutes % 60);
-        const icSecs = now.getUTCSeconds();
-        return {
-            hours: icHours,
-            minutes: icMins,
-            seconds: icSecs,
-            formattedTime: `${String(icHours).padStart(2, '0')}:${String(icMins).padStart(2, '0')}`,
-            formattedFull: `${String(icHours).padStart(2, '0')}:${String(icMins).padStart(2, '0')}:${String(icSecs).padStart(2, '0')}`
-        };
+        // Server time follows UK (London) which automatically accounts for British Summer Time (BST) / Daylight Saving Time (DST)
+        // BST (Summer): UTC+1 (e.g. 23:28 when UTC is 22:28)
+        // GMT (Winter): UTC+0
+        try {
+            const formatter = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Europe/London',
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const parts = formatter.formatToParts(now);
+            const partMap = {};
+            parts.forEach(p => { partMap[p.type] = p.value; });
+
+            let icHours = parseInt(partMap.hour, 10);
+            if (icHours === 24) icHours = 0;
+            const icMins = parseInt(partMap.minute, 10);
+            const icSecs = parseInt(partMap.second, 10);
+
+            return {
+                hours: icHours,
+                minutes: icMins,
+                seconds: icSecs,
+                formattedTime: `${String(icHours).padStart(2, '0')}:${String(icMins).padStart(2, '0')}`,
+                formattedFull: `${String(icHours).padStart(2, '0')}:${String(icMins).padStart(2, '0')}:${String(icSecs).padStart(2, '0')}`
+            };
+        } catch (e) {
+            // Fallback calculation accounting for European Daylight Saving Time (UTC+1 in summer, UTC+0 in winter)
+            const month = now.getUTCMonth();
+            const isDst = month >= 3 && month <= 9;
+            const offsetMin = isDst ? 60 : 0;
+            const utcMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+            const icTotalMinutes = (utcMinutes + offsetMin + 1440) % 1440;
+            const icHours = Math.floor(icTotalMinutes / 60);
+            const icMins = Math.floor(icTotalMinutes % 60);
+            const icSecs = now.getUTCSeconds();
+            return {
+                hours: icHours,
+                minutes: icMins,
+                seconds: icSecs,
+                formattedTime: `${String(icHours).padStart(2, '0')}:${String(icMins).padStart(2, '0')}`,
+                formattedFull: `${String(icHours).padStart(2, '0')}:${String(icMins).padStart(2, '0')}:${String(icSecs).padStart(2, '0')}`
+            };
+        }
     }
 
     function getLocalTime() {
@@ -505,7 +600,7 @@
             if (bigClockEl) {
                 bigClockEl.innerHTML = `
                     <div class="hud-clock-group">
-                        <div class="hud-clock-card ic-card" title="In-City Time (UTC+2)">
+                        <div class="hud-clock-card ic-card" title="In-City Time (GrandRP Server / BST/GMT)">
                             <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">schedule</span> IC TIME</div>
                             <div class="hud-clock-digits ic-digits">${ic.formattedFull}</div>
                         </div>
@@ -582,7 +677,7 @@
 
         const bonusValEl = document.getElementById('compact-bonus-val');
         if (bonusValEl) {
-            bonusValEl.textContent = `$${totalBonus.toLocaleString()}`;
+            bonusValEl.textContent = formatCurrency(totalBonus);
         }
 
         const rect = document.getElementById('progress-outline-rect');
@@ -602,20 +697,22 @@
     }
 
     function setDutyStatusUI(isOnDuty) {
+        state.isOnDuty = Boolean(isOnDuty);
         const dutyBtn = document.getElementById('topbar-duty-btn');
+        const dutyIcon = document.getElementById('topbar-duty-icon');
         const dutyPill = document.getElementById('modal-duty-status-pill');
-        const topDutyPill = document.getElementById('topbar-duty-status-pill');
-        const topDutyText = document.getElementById('topbar-duty-status-text');
 
         if (dutyBtn) {
             if (isOnDuty) {
                 dutyBtn.classList.remove('off-duty');
                 dutyBtn.classList.add('on-duty');
-                dutyBtn.setAttribute('title', 'Active: ON DUTY (Click to switch OFF DUTY & copy 10-9 command)');
+                dutyBtn.setAttribute('title', 'Active: ON DUTY [U] (Click to switch OFF DUTY & copy 10-9 command)');
+                if (dutyIcon) dutyIcon.textContent = 'local_police';
             } else {
                 dutyBtn.classList.remove('on-duty');
                 dutyBtn.classList.add('off-duty');
-                dutyBtn.setAttribute('title', 'Inactive: OFF DUTY (Click to switch ON DUTY & copy 10-8 command)');
+                dutyBtn.setAttribute('title', 'Inactive: OFF DUTY [U] (Click to switch ON DUTY & copy 10-8 command)');
+                if (dutyIcon) dutyIcon.textContent = 'power_settings_new';
             }
         }
 
@@ -623,58 +720,42 @@
             dutyPill.className = `duty-pill ${isOnDuty ? 'on-duty' : 'off-duty'}`;
             dutyPill.innerHTML = `<span class="pulse-dot"></span> <span class="duty-pill-text">${isOnDuty ? 'ON DUTY' : 'OFF DUTY'}</span>`;
         }
-
-        if (topDutyPill) {
-            topDutyPill.className = `topbar-duty-pill ${isOnDuty ? 'on-duty' : 'off-duty'}`;
-        }
-        if (topDutyText) {
-            topDutyText.textContent = isOnDuty ? 'ON DUTY' : 'OFF DUTY';
-        }
     }
 
     function toggleDutyStatus() {
-        const isCurrentlyOnDuty = Boolean(state.dutyStartTime);
+        const isCurrentlyOnDuty = Boolean(state.isOnDuty || state.dutyStartTime);
 
         if (!isCurrentlyOnDuty) {
             // User wants to go ON DUTY
-            // 1. Validate Badge ID
-            const badge = (state.badgeNum || '').trim();
+            // 1. Validate / Prompt for Badge ID if missing
+            let badge = (state.badgeNum || document.getElementById('settingBadgeNum')?.value || '').trim();
             if (!badge) {
-                showNotificationToast('Please configure your Badge ID in Settings first!', 'warning');
-                if (window.soundSystem && state.soundEnabled !== false) {
-                    window.soundSystem.playTimerAlert();
+                const promptBadge = prompt('Enter your SAHP Badge ID (e.g. 104) to go On Duty:');
+                if (promptBadge && promptBadge.trim()) {
+                    badge = promptBadge.trim();
+                    state.badgeNum = badge;
+                    const badgeInput = document.getElementById('settingBadgeNum');
+                    if (badgeInput) badgeInput.value = badge;
+                    updateOfficerTopBarBadge();
+                    stateManager.save();
+                } else {
+                    badge = 'TROOPER'; // Fallback so toggling duty is never broken
                 }
-                openModal('modal-settings');
-                const badgeInput = document.getElementById('settingBadgeNum');
-                if (badgeInput) {
-                    badgeInput.focus();
-                    badgeInput.style.borderColor = '#ef4444';
-                    setTimeout(() => { badgeInput.style.borderColor = ''; }, 2500);
-                }
-                return;
             }
 
-            // 2. Validate Job Type
-            const jobType = (state.jobType || (document.getElementById('topbar-job-type')?.value) || '').trim();
+            // 2. Validate / Default Job Type
+            let jobType = (state.jobType || document.getElementById('topbar-job-type')?.value || '').trim();
             if (!jobType) {
-                showNotificationToast('Please select your Duty / Job Assignment first!', 'warning');
-                if (window.soundSystem && state.soundEnabled !== false) {
-                    window.soundSystem.playTimerAlert();
-                }
-                const topbarJob = document.getElementById('topbar-job-type');
-                if (topbarJob) {
-                    topbarJob.focus();
-                    topbarJob.style.borderColor = '#ef4444';
-                    setTimeout(() => { topbarJob.style.borderColor = ''; }, 2500);
-                }
-                return;
+                jobType = 'Highway Patrol';
+                setJobType(jobType);
             }
 
             // 3. Format: "10-8 {Duty name} {current IC time}"
             const ic = getICTime();
             const cmd = `10-8 ${jobType} ${ic.formattedTime}`;
-            copySimple(cmd);
+            copyToClipboardSilent(cmd);
 
+            state.isOnDuty = true;
             state.dutyStartTime = Date.now();
             stateManager.save();
             playSound('playDutyChime');
@@ -682,11 +763,12 @@
             showNotificationToast(`ON DUTY: Copied "${cmd}" to clipboard`, 'check_circle');
         } else {
             // User wants to go OFF DUTY
-            const jobType = (state.jobType || (document.getElementById('topbar-job-type')?.value) || 'Patrol').trim();
+            let jobType = (state.jobType || document.getElementById('topbar-job-type')?.value || 'Highway Patrol').trim();
             const ic = getICTime();
             const cmd = `10-9 ${jobType} ${ic.formattedTime}`;
-            copySimple(cmd);
+            copyToClipboardSilent(cmd);
 
+            state.isOnDuty = false;
             state.dutyStartTime = null;
             stateManager.save();
             playSound('playDutyChime');
@@ -696,7 +778,8 @@
     }
 
     function startShift(locName) {
-        state.selectedLocation = locName || document.getElementById('rota-location')?.value || 'Patrol (Mission Row)';
+        state.selectedLocation = locName || document.getElementById('rota-location')?.value || 'Patrol (Highway / Paleto)';
+        state.isOnDuty = true;
         state.dutyStartTime = Date.now();
         stateManager.save();
         playSound('playDutyChime');
@@ -705,6 +788,7 @@
     }
 
     function confirmEndShift() {
+        state.isOnDuty = false;
         state.dutyStartTime = null;
         stateManager.save();
         playSound('playDutyChime');
@@ -923,11 +1007,13 @@
 
             // Auto-set duty status when completing step 3
             if (targetId === 'od3') {
+                state.isOnDuty = true;
                 state.dutyStartTime = Date.now();
                 stateManager.save();
                 setDutyStatusUI(true);
             }
             if (targetId === 'off3') {
+                state.isOnDuty = false;
                 state.dutyStartTime = null;
                 stateManager.save();
                 setDutyStatusUI(false);
@@ -999,7 +1085,7 @@
                 <div class="penal-row ${isSelected ? 'selected' : ''}" onclick="window.app.toggleSelectCharge('${item.code}')">
                     <span class="penal-badge-code">${item.code}</span>
                     <span style="font-weight:600; color:var(--text-main);">${item.title}</span>
-                    <span style="color:#34d399; font-weight:700;">${item.fine}</span>
+                    <span style="color:#34d399; font-weight:700;">${formatCurrency(item.fineAmount !== undefined ? item.fineAmount : item.fine)}</span>
                     <span style="color:#38bdf8;">${item.sentence}</span>
                     <span class="penal-badge-stars">${item.stars}</span>
                     <span>${item.noBail ? '<span class="penal-badge-bail-no">NO BAIL</span>' : '<span class="penal-badge-bail-yes">BAIL OK</span>'}</span>
@@ -1055,7 +1141,7 @@
         });
 
         const fineEl = document.getElementById('stat-total-fine');
-        if (fineEl) fineEl.textContent = `$${totalFine.toLocaleString()}`;
+        if (fineEl) fineEl.textContent = formatCurrency(totalFine);
 
         const sentenceEl = document.getElementById('stat-total-sentence');
         if (sentenceEl) sentenceEl.textContent = totalMonths > 0 ? `${totalMonths} mo` : '-';
@@ -1077,26 +1163,64 @@
             }
         }
 
-        const pdaBox = document.getElementById('citation-pda-text');
-        if (pdaBox) {
-            pdaBox.textContent = pdaTextList.length > 0 ? pdaTextList.join(' | ') : 'Select one or more penal codes above to generate PDA citation charges...';
+        // Render separate input boxes for each charge
+        const slotsContainer = document.getElementById('penal-pda-slots-container');
+        const countHint = document.getElementById('penal-pda-count-hint');
+        if (countHint) {
+            countHint.textContent = count === 0 ? 'Paste separately' : `${count} slot${count > 1 ? 's' : ''}`;
+        }
+        if (slotsContainer) {
+            if (pdaTextList.length === 0) {
+                slotsContainer.innerHTML = '<div class="pda-empty-hint">Select one or more penal codes above to generate PDA charge slots...</div>';
+            } else {
+                slotsContainer.innerHTML = pdaTextList.map((chargeText, i) => {
+                    const safeText = escapeHtml(chargeText);
+                    const safeAttr = escapeForAttribute(chargeText);
+                    return `
+                        <div class="pda-slot-item">
+                            <div class="pda-slot-header">
+                                <span class="pda-slot-badge"><span class="material-symbols-outlined" style="font-size:0.75rem;">label</span> Slot #${i + 1}</span>
+                                <button type="button" class="pda-slot-copy-btn" onclick="window.app.copyPdaSlotText(this, '${safeAttr}')" title="Copy Slot #${i + 1}">
+                                    <span class="material-symbols-outlined" style="font-size:0.75rem;">content_copy</span> Copy
+                                </button>
+                            </div>
+                            <input type="text" class="pda-slot-input" readonly value="${safeText}" onclick="this.select(); window.app.copyPdaSlotText(this, '${safeAttr}')" title="Click to copy Slot #${i + 1}" />
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Toggle slide-in drawer on the right of the viewport
+        const card = document.getElementById('penal-citation-summary');
+        const modalPenal = document.getElementById('modal-penal');
+        const isPenalModalActive = modalPenal && modalPenal.classList.contains('active');
+        const isPenalPane = !document.getElementById('legal-engine-traffic-pane') || document.getElementById('legal-engine-traffic-pane').style.display === 'none';
+
+        if (card) {
+            card.classList.toggle('has-charges', isPenalModalActive && isPenalPane && count > 0);
+        }
+        if (modalPenal) {
+            if (isPenalPane) {
+                modalPenal.classList.toggle('has-summary-docked', count > 0);
+            }
         }
     }
 
     function copyPdaCitation() {
-        const pdaBox = document.getElementById('citation-pda-text');
-        if (!pdaBox || state.selectedCharges.length === 0) {
+        if (!state.selectedCharges || state.selectedCharges.length === 0) {
             alert('Please select at least one charge from the Penal Code list first.');
             return;
         }
 
-        copyTextToClipboard(pdaBox.textContent).then(() => {
+        const pdaAllText = state.selectedCharges.map(c => `${c.code} ${c.title}`).join(' | ');
+        copyTextToClipboard(pdaAllText).then(() => {
             playSound('playCopyBeep');
             const btn = document.getElementById('btn-copy-pda');
             if (btn) {
-                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">done</span> Copied to PDA!';
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">done</span> Copied All!';
                 setTimeout(() => {
-                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy for PDA (J)';
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy All (J)';
                 }, 1500);
             }
         });
@@ -1203,7 +1327,7 @@
                         <div style="font-weight:600; color:var(--text-main); line-height:1.35;">${item.title}</div>
                         ${item.remarks ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">${item.remarks}</div>` : ''}
                     </div>
-                    <span style="color:#34d399; font-weight:700;">${item.fine || '-'}</span>
+                    <span style="color:#34d399; font-weight:700;">${item.fine ? formatCurrency(item.fineAmount !== undefined ? item.fineAmount : item.fine) : '-'}</span>
                     <span style="color:#38bdf8;">${item.sentence || '-'}</span>
                     <span class="penal-badge-stars">${starsDisplay}</span>
                     <span>${bailOrTowBadge}</span>
@@ -1268,7 +1392,7 @@
         });
 
         const fineEl = document.getElementById('traffic-stat-total-fine');
-        if (fineEl) fineEl.textContent = `$${totalFine.toLocaleString()}`;
+        if (fineEl) fineEl.textContent = formatCurrency(totalFine);
 
         const sentenceEl = document.getElementById('traffic-stat-total-sentence');
         if (sentenceEl) sentenceEl.textContent = totalMonths > 0 ? `${totalMonths} mo` : '-';
@@ -1307,26 +1431,64 @@
             }
         }
 
-        const pdaBox = document.getElementById('traffic-citation-pda-text');
-        if (pdaBox) {
-            pdaBox.textContent = pdaTextList.length > 0 ? pdaTextList.join(' | ') : 'Select one or more traffic codes or regulations above to generate PDA citation charges...';
+        // Render separate input boxes for each traffic charge
+        const slotsContainer = document.getElementById('traffic-pda-slots-container');
+        const countHint = document.getElementById('traffic-pda-count-hint');
+        if (countHint) {
+            countHint.textContent = count === 0 ? 'Paste separately' : `${count} slot${count > 1 ? 's' : ''}`;
+        }
+        if (slotsContainer) {
+            if (pdaTextList.length === 0) {
+                slotsContainer.innerHTML = '<div class="pda-empty-hint">Select one or more traffic codes or regulations above to generate PDA citation slots...</div>';
+            } else {
+                slotsContainer.innerHTML = pdaTextList.map((chargeText, i) => {
+                    const safeText = escapeHtml(chargeText);
+                    const safeAttr = escapeForAttribute(chargeText);
+                    return `
+                        <div class="pda-slot-item">
+                            <div class="pda-slot-header">
+                                <span class="pda-slot-badge"><span class="material-symbols-outlined" style="font-size:0.75rem;">label</span> Slot #${i + 1}</span>
+                                <button type="button" class="pda-slot-copy-btn" onclick="window.app.copyPdaSlotText(this, '${safeAttr}')" title="Copy Slot #${i + 1}">
+                                    <span class="material-symbols-outlined" style="font-size:0.75rem;">content_copy</span> Copy
+                                </button>
+                            </div>
+                            <input type="text" class="pda-slot-input" readonly value="${safeText}" onclick="this.select(); window.app.copyPdaSlotText(this, '${safeAttr}')" title="Click to copy Slot #${i + 1}" />
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Toggle slide-in drawer on the right of the viewport
+        const card = document.getElementById('traffic-citation-summary');
+        const modalPenal = document.getElementById('modal-penal');
+        const isPenalModalActive = modalPenal && modalPenal.classList.contains('active');
+        const isTrafficPane = document.getElementById('legal-engine-traffic-pane') && document.getElementById('legal-engine-traffic-pane').style.display !== 'none';
+
+        if (card) {
+            card.classList.toggle('has-charges', isPenalModalActive && isTrafficPane && count > 0);
+        }
+        if (modalPenal) {
+            if (isTrafficPane) {
+                modalPenal.classList.toggle('has-summary-docked', count > 0);
+            }
         }
     }
 
     function copyTrafficPdaCitation() {
-        const pdaBox = document.getElementById('traffic-citation-pda-text');
-        if (!pdaBox || !state.selectedTrafficCharges || state.selectedTrafficCharges.length === 0) {
+        if (!state.selectedTrafficCharges || state.selectedTrafficCharges.length === 0) {
             alert('Please select at least one traffic charge first.');
             return;
         }
 
-        copyTextToClipboard(pdaBox.textContent).then(() => {
+        const pdaAllText = state.selectedTrafficCharges.map(c => `${c.code} ${c.title}`).join(' | ');
+        copyTextToClipboard(pdaAllText).then(() => {
             playSound('playCopyBeep');
             const btn = document.getElementById('btn-copy-traffic-pda');
             if (btn) {
-                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">done</span> Copied to PDA!';
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">done</span> Copied All!';
                 setTimeout(() => {
-                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy for PDA (J)';
+                    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy All (J)';
                 }, 1500);
             }
         });
@@ -1358,7 +1520,7 @@
         const fee = Math.round(numeric * 0.10); // 10% fee matrix
         const out = document.getElementById('impound-fee-result');
         if (out) {
-            out.textContent = `$${fee.toLocaleString()}`;
+            out.textContent = formatCurrency(fee);
         }
     }
 
@@ -1637,24 +1799,143 @@
         const trafficBtn = document.getElementById('tab-btn-traffic');
         const penalPane = document.getElementById('legal-engine-penal-pane');
         const trafficPane = document.getElementById('legal-engine-traffic-pane');
+        const penalCard = document.getElementById('penal-citation-summary');
+        const trafficCard = document.getElementById('traffic-citation-summary');
 
         if (tabName === 'traffic') {
             if (penalBtn) penalBtn.classList.remove('active');
             if (trafficBtn) trafficBtn.classList.add('active');
             if (penalPane) penalPane.style.display = 'none';
             if (trafficPane) trafficPane.style.display = 'block';
+            if (penalCard) penalCard.classList.remove('has-charges');
             renderTrafficCodes();
+            updateTrafficCitationSummary();
         } else {
             if (trafficBtn) trafficBtn.classList.remove('active');
             if (penalBtn) penalBtn.classList.add('active');
             if (trafficPane) trafficPane.style.display = 'none';
             if (penalPane) penalPane.style.display = 'block';
+            if (trafficCard) trafficCard.classList.remove('has-charges');
             renderPenalCodes();
+            updateCitationSummary();
         }
 
         if (window.soundSystem && state.soundEnabled !== false) {
             window.soundSystem.playRadioClick();
         }
+    }
+
+    function copyPdaSlotText(targetEl, text) {
+        if (!text) return;
+        copyTextToClipboard(text).then(() => {
+            playSound('playCopyBeep');
+            const slotItem = targetEl.closest ? targetEl.closest('.pda-slot-item') : null;
+            const btn = slotItem ? slotItem.querySelector('.pda-slot-copy-btn') : (targetEl.classList && targetEl.classList.contains('pda-slot-copy-btn') ? targetEl : null);
+            if (btn) {
+                const prevHtml = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:0.75rem;">done</span> Copied!';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = prevHtml;
+                }, 1400);
+            }
+        });
+    }
+
+    function makeCardDraggable(cardEl, handleEl) {
+        if (!cardEl || !handleEl) return;
+        let isDragging = false;
+        let startPointerX = 0;
+        let startPointerY = 0;
+        let startCardLeft = 0;
+        let startCardTop = 0;
+
+        const onPointerDown = (e) => {
+            if (e.target.closest('button') || e.target.closest('input') || e.target.closest('a')) return;
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+            // Get exact visual rect in viewport space before modifying any styles
+            const rect = cardEl.getBoundingClientRect();
+            startPointerX = e.clientX;
+            startPointerY = e.clientY;
+            startCardLeft = rect.left;
+            startCardTop = rect.top;
+
+            isDragging = true;
+            cardEl.classList.add('is-dragging');
+            cardEl.dataset.isCustomPos = 'true';
+            cardEl.style.transition = 'none';
+
+            // Pin card directly at its exact visual pixel coordinates (zero shift)
+            cardEl.style.left = `${startCardLeft}px`;
+            cardEl.style.top = `${startCardTop}px`;
+            cardEl.style.right = 'auto';
+            cardEl.style.bottom = 'auto';
+            cardEl.style.transform = 'none';
+
+            void cardEl.offsetWidth; // Commit coordinates synchronously
+
+            window.addEventListener('pointermove', onPointerMove, { passive: false });
+            window.addEventListener('pointerup', onPointerUp);
+            window.addEventListener('pointercancel', onPointerUp);
+
+            e.preventDefault();
+        };
+
+        const onPointerMove = (e) => {
+            if (!isDragging) return;
+
+            const deltaX = e.clientX - startPointerX;
+            const deltaY = e.clientY - startPointerY;
+
+            let newLeft = startCardLeft + deltaX;
+            let newTop = startCardTop + deltaY;
+
+            const cardWidth = cardEl.offsetWidth;
+            const cardHeight = cardEl.offsetHeight;
+            const maxLeft = Math.max(0, window.innerWidth - cardWidth);
+            const maxTop = Math.max(0, window.innerHeight - cardHeight);
+
+            newLeft = Math.max(0, Math.min(maxLeft, newLeft));
+            newTop = Math.max(0, Math.min(maxTop, newTop));
+
+            cardEl.style.left = `${Math.round(newLeft)}px`;
+            cardEl.style.top = `${Math.round(newTop)}px`;
+
+            e.preventDefault();
+        };
+
+        const onPointerUp = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            cardEl.classList.remove('is-dragging');
+            cardEl.style.transition = '';
+
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+            window.removeEventListener('pointercancel', onPointerUp);
+        };
+
+        const headerEl = cardEl.querySelector('.citation-card-header');
+        const dragTarget = headerEl || handleEl;
+        dragTarget.addEventListener('pointerdown', onPointerDown);
+        dragTarget.addEventListener('dragstart', (e) => e.preventDefault());
+        handleEl.addEventListener('dragstart', (e) => e.preventDefault());
+    }
+
+    function resetCitationSummaryPos(cardId) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+        delete card.dataset.isCustomPos;
+        card.style.left = '';
+        card.style.top = '';
+        card.style.right = '';
+        card.style.bottom = '';
+        card.style.width = '';
+        card.style.height = '';
+        card.style.transform = '';
+        playSound('playRadioClick');
     }
 
     const modalManager = new ModalManager();
@@ -1680,6 +1961,10 @@
         toggleSelectCharge,
         clearSelectedCharges,
         copyPdaCitation,
+        copyPdaSlotText,
+        resetCitationSummaryPos,
+        formatCurrency,
+        updateCitationSummary,
         toggleSelectTrafficCharge,
         clearSelectedTrafficCharges,
         copyTrafficPdaCitation,
@@ -1717,6 +2002,10 @@
         updateCitationSummary();
         updateTrafficCitationSummary();
         updateDefaultsBadge();
+
+        // Initialize Draggable Citation Summaries
+        makeCardDraggable(document.getElementById('penal-citation-summary'), document.getElementById('penal-summary-drag-handle'));
+        makeCardDraggable(document.getElementById('traffic-citation-summary'), document.getElementById('traffic-summary-drag-handle'));
 
         // Update live clocks every 1000ms (1s)
         setInterval(updateLiveClocks, 1000);
@@ -1826,6 +2115,17 @@ function openModal(modalId) {
     modal.classList.remove('closing');
     modal.classList.add('active');
 
+    if (modalId === 'modal-penal') {
+        setTimeout(() => {
+            const isTraffic = document.getElementById('legal-engine-traffic-pane') && document.getElementById('legal-engine-traffic-pane').style.display !== 'none';
+            if (isTraffic && window.app && window.app.updateTrafficCitationSummary) {
+                window.app.updateTrafficCitationSummary();
+            } else if (window.app && window.app.updateCitationSummary) {
+                window.app.updateCitationSummary();
+            }
+        }, 10);
+    }
+
     updateModalStackLayers();
 }
 
@@ -1887,7 +2187,19 @@ function closeSpecificModal(modalId) {
 
     modal.classList.add('closing');
 
+    if (modalId === 'modal-penal') {
+        const pCard = document.getElementById('penal-citation-summary');
+        const tCard = document.getElementById('traffic-citation-summary');
+        if (pCard) pCard.classList.remove('has-charges');
+        if (tCard) tCard.classList.remove('has-charges');
+    }
+
     if (modalStack.length === 0) {
+        const pCard = document.getElementById('penal-citation-summary');
+        const tCard = document.getElementById('traffic-citation-summary');
+        if (pCard) pCard.classList.remove('has-charges');
+        if (tCard) tCard.classList.remove('has-charges');
+
         const overlay = document.getElementById('modalOverlay');
         if (overlay) overlay.classList.add('closing');
         setTimeout(() => {
@@ -2155,6 +2467,18 @@ function fallbackCopy(text) {
     document.body.removeChild(textArea);
 }
 
+function copyToClipboardSilent(text) {
+    if (!text) return Promise.resolve();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).catch(() => {
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
+        return Promise.resolve();
+    }
+}
+
 function copySimple(text) {
     if (!text) return;
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -2291,7 +2615,7 @@ function buildOmniSearchIndex() {
                 badgeIcon: 'traffic',
                 badgeText: 'Traffic Code',
                 title: `${t.code} - ${t.title}`,
-                meta: `${t.category || 'Traffic'} • Fine: ${t.fine} • Points: ${t.points || '0'} • Impound Fee: ${t.impoundFee ? '$' + t.impoundFee.toLocaleString() : 'N/A'}`,
+                meta: `${t.category || 'Traffic'} • Fine: ${t.fine} • Points: ${t.points || '0'} • Impound Fee: ${t.impoundFee ? formatCurrency(t.impoundFee) : 'N/A'}`,
                 snippet: `${t.code} ${t.title} | Fine: ${t.fine} | Points: ${t.points || 0}`,
                 copyText: `${t.code} - ${t.title} (${t.fine})`,
                 searchStr: `${t.code} ${t.title} ${t.category || ''} ${t.fine || ''} ${t.points || ''} ${t.remarks || ''}`.toLowerCase(),
@@ -2850,5 +3174,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleBackdropClick();
             }
         });
+    }
+
+    // Dynamic width observer for .top-bar (< 820px)
+    const topBarEl = document.querySelector('.top-bar');
+    if (topBarEl && window.ResizeObserver) {
+        const topBarObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const width = entry.contentRect.width;
+                if (width < 820) {
+                    topBarEl.classList.add('compact-topbar');
+                } else {
+                    topBarEl.classList.remove('compact-topbar');
+                }
+            }
+        });
+        topBarObserver.observe(topBarEl);
     }
 });

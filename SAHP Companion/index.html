@@ -53,102 +53,49 @@
                 <rect class="progress-outline-rect" id="progress-outline-rect" x="0" y="0" width="100%" height="100%" rx="20" pathLength="1000"></rect>
             </svg>
 
-            <!-- Department Branding & Duty Indicator -->
-            <div class="topbar-branding">
-                <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini" title="San Andreas Highway Patrol">
-                <div class="topbar-duty-wrap">
-                    <button class="topbar-duty-icon-btn off-duty" id="topbar-duty-btn" onclick="window.app.toggleDutyStatus()" title="Toggle Duty Status (Copy 10-8 / 10-9) [U]" aria-label="Toggle Duty Status">
-                        <span class="material-symbols-outlined" id="topbar-duty-icon">power_settings_new</span>
-                    </button>
-                    <kbd class="dock-kbd">U</kbd>
-                </div>
-                <select id="topbar-job-type" class="topbar-job-select" onchange="window.app.setJobType(this.value)" title="Active Duty Assignment">
-                    <option value="" disabled selected>Select Duty...</option>
-                    <option value="Highway Patrol">Highway Patrol</option>
-                    <option value="City Patrol">City Patrol</option>
-                    <option value="Traffic Enforcement">Traffic Enforcement</option>
-                    <option value="Speed Radar Enforcement">Speed Radar Enforcement</option>
-                    <option value="Detective Bureau">Detective Bureau</option>
-                    <option value="Air Support">Air Support</option>
-                    <option value="DOC Transport">DOC Transport</option>
-                    <option value="HQ Front Desk">HQ Front Desk</option>
-                    <option value="Training / HR">Training / HR</option>
-                </select>
-                <div class="topbar-officer-pill" id="topbar-officer-pill" onclick="openModal('modal-settings')" title="Click to edit Officer Profile">
-                    <span class="material-symbols-outlined" style="font-size:0.95rem; color:var(--gold);">badge</span>
-                    <span id="topbar-officer-name">TROOPER [UNASSIGNED]</span>
-                </div>
+            <!-- SAHP Official Crest Badge (Always pinned on the left of the top-bar) -->
+            <div class="topbar-logo-anchor">
+                <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini" id="topbar-sahp-logo" title="San Andreas Highway Patrol">
             </div>
 
-            <!--
-            =====================================================
-            ROTA / SHIFT TIMER (COMMENTED OUT AS REQUESTED)
-            =====================================================
-            <div class="di-view" id="tb-default-view">
-                <img src="SAHP-LOGO.png" alt="SAHP" class="sahp-badge-mini">
-                <div style="font-size: 0.92rem; color: var(--text-muted); font-weight: 600;">
-                    Complete on-duty bodycam logs or select assignment to start shift
-                </div>
-                <div style="display: flex; gap: 0.5rem; align-items: center; margin-left: 0.5rem;">
-                    <select id="rota-location" class="rota-select">
-                        <option value="Patrol (Mission Row)">Patrol (Mission Row)</option>
-                        <option value="Patrol (Vinewood / Rockford)">Patrol (Vinewood / Rockford)</option>
-                        <option value="Patrol (Sandy Shores / Highway)">Patrol (Sandy Shores / Highway)</option>
-                        <option value="Traffic Enforcement">Traffic Enforcement</option>
-                        <option value="Detective Bureau">Detective Bureau</option>
-                        <option value="Air Support (Air One)">Air Support (Air One)</option>
-                        <option value="DOC Booking / Transport">DOC Booking / Transport</option>
-                    </select>
-                    <button class="btn btn-success btn-sm" onclick="window.app.startShift()">
-                        <span class="material-symbols-outlined" style="font-size:1.1rem;">play_arrow</span><span>Start</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="di-view hidden" id="tb-compact-view">
-                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                    <button class="btn btn-danger btn-sm" onclick="window.app.showConfirmEndShift()">
-                        <span class="material-symbols-outlined" style="font-size:1.1rem;">stop</span><span>End</span>
-                    </button>
-                    <div id="compact-main-timer">0 hr 00:00</div>
-                    <span class="compact-loc-pill">
-                        <span class="material-symbols-outlined" style="font-size:0.85rem;">local_police</span>
-                        <span id="compact-loc-val">Patrol (Mission Row)</span>
-                    </span>
-                    <span class="compact-bonus-pill" id="compact-bonus-pill" title="Estimated Shift Salary + Bounties">
-                        <span class="material-symbols-outlined" style="font-size:0.85rem;">payments</span>
-                        <span class="material-symbols-outlined night-icon hidden" id="compact-night-icon" style="font-size:0.85rem; color:#f1c40f;" title="Night Shift Active (00:00-06:00 IC)">dark_mode</span>
-                        <span id="compact-bonus-val">$0</span>
-                    </span>
-                    <span class="compact-arrest-pill" onclick="openModal('modal-arrest')" title="Click to view 25-Min Arrest Timer">
-                        <span class="material-symbols-outlined" style="font-size:0.85rem;">timer</span>
-                        <span>Arrest: <strong id="compact-arrest-val">25:00</strong></span>
-                    </span>
-                </div>
-            </div>
-
-            <div class="di-view hidden" id="tb-confirm-view">
-                <div style="display: flex; gap: 0.6rem; align-items: center;">
-                    <button class="btn btn-secondary btn-sm" onclick="window.app.cancelConfirmEndShift()">
-                        <span class="material-symbols-outlined" style="font-size:1.1rem;">arrow_back</span><span>Back</span>
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="window.app.confirmEndShift()" style="font-weight: bold;">
-                        Confirm End Shift?
-                    </button>
-                </div>
-            </div>
-            -->
-
-            <!-- Highlighted & Enlarged Dual Clock HUD (IC & Local) -->
-            <div id="big-live-clock">
-                <div class="hud-clock-group">
-                    <div class="hud-clock-card ic-card">
-                        <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">schedule</span> IC TIME</div>
-                        <div class="hud-clock-digits ic-digits">--:--:--</div>
+            <!-- Topbar Main Wrap: Controls and Clocks -->
+            <div class="topbar-main-wrap">
+                <!-- Department Branding & Duty Indicator -->
+                <div class="topbar-branding">
+                    <div class="topbar-duty-wrap">
+                        <button class="topbar-duty-icon-btn off-duty" id="topbar-duty-btn" onclick="window.app.toggleDutyStatus()" title="Toggle Duty Status (Copy 10-8 / 10-9) [U]" aria-label="Toggle Duty Status">
+                            <span class="material-symbols-outlined" id="topbar-duty-icon">power_settings_new</span>
+                        </button>
+                        <kbd class="dock-kbd">U</kbd>
                     </div>
-                    <div class="hud-clock-card local-card">
-                        <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">public</span> LOCAL TIME</div>
-                        <div class="hud-clock-digits local-digits">--:--:--</div>
+                    <select id="topbar-job-type" class="topbar-job-select" onchange="window.app.setJobType(this.value)" title="Active Duty Assignment">
+                        <option value="Highway Patrol" selected>Highway Patrol</option>
+                        <option value="City Patrol">City Patrol</option>
+                        <option value="Traffic Enforcement">Traffic Enforcement</option>
+                        <option value="Speed Radar Enforcement">Speed Radar Enforcement</option>
+                        <option value="Detective Bureau">Detective Bureau</option>
+                        <option value="Air Support">Air Support</option>
+                        <option value="DOC Transport">DOC Transport</option>
+                        <option value="HQ Front Desk">HQ Front Desk</option>
+                        <option value="Training / HR">Training / HR</option>
+                    </select>
+                    <div class="topbar-officer-pill" id="topbar-officer-pill" onclick="openModal('modal-settings')" title="Click to edit Officer Profile">
+                        <span class="material-symbols-outlined" style="font-size:0.95rem; color:var(--gold);">badge</span>
+                        <span id="topbar-officer-name">TROOPER [UNASSIGNED]</span>
+                    </div>
+                </div>
+
+                <!-- Highlighted & Enlarged Dual Clock HUD (IC & Local) -->
+                <div id="big-live-clock">
+                    <div class="hud-clock-group">
+                        <div class="hud-clock-card ic-card">
+                            <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">schedule</span> IC TIME</div>
+                            <div class="hud-clock-digits ic-digits">--:--:--</div>
+                        </div>
+                        <div class="hud-clock-card local-card">
+                            <div class="hud-clock-badge"><span class="material-symbols-outlined" style="font-size:0.85rem;">public</span> LOCAL TIME</div>
+                            <div class="hud-clock-digits local-digits">--:--:--</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1262,7 +1209,7 @@
 
                         <!-- Penal Code Table -->
                         <div class="penal-table-container">
-                            <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 90px 1fr 100px 90px 65px 70px 40px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <div class="penal-table-header">
                                 <span>Code</span>
                                 <span>Law Description</span>
                                 <span>Fine</span>
@@ -1273,60 +1220,6 @@
                             </div>
                             <div id="penal-table-body">
                                 <!-- Populated dynamically via JS -->
-                            </div>
-                        </div>
-
-                        <!-- Live Citation / Booking Calculation Summary -->
-                        <div class="citation-summary-card">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-weight:700; font-size:0.95rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
-                                    <span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.15rem;">calculate</span> Citation &amp; Charge Summary
-                                </span>
-                                <button class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedCharges()" style="color:#ef4444;">
-                                    <span class="material-symbols-outlined" style="font-size:0.85rem;">delete</span> Clear Selection
-                                </button>
-                            </div>
-
-                            <div class="citation-stats-grid">
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Total Fine</div>
-                                    <div class="citation-stat-val money" id="stat-total-fine">$0</div>
-                                </div>
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Total Sentence</div>
-                                    <div class="citation-stat-val sentence" id="stat-total-sentence">-</div>
-                                </div>
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Wanted Stars</div>
-                                    <div class="citation-stat-val stars" id="stat-max-stars">-</div>
-                                </div>
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Bail Eligibility</div>
-                                    <div class="citation-stat-val" id="stat-bail-status">-</div>
-                                </div>
-                            </div>
-
-                            <!-- Formatted In-Game PDA Text Box -->
-                            <div class="input-group" style="margin-top:0.4rem; margin-bottom:0;">
-                                <label style="display:flex; justify-content:space-between;">
-                                    <span>In-Game PDA Charge Format (Flex 'J' Muscle)</span>
-                                    <span style="color:var(--text-muted); font-size:0.7rem;">Ready to paste directly into PDA wanted issue</span>
-                                </label>
-                                <div id="citation-pda-text" style="background:rgba(3,7,18,0.7); border:1px solid var(--card-border); padding:0.75rem; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:#38bdf8; min-height:44px; word-break:break-all;">
-                                    Select one or more penal codes above to generate PDA citation charges...
-                                </div>
-                            </div>
-
-                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                                <button class="btn btn-primary" id="btn-copy-pda" style="flex:1; min-width:140px; padding:0.65rem;" onclick="window.app.copyPdaCitation()">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy for PDA (J)
-                                </button>
-                                <button class="btn btn-info discord-jump-btn" data-discord-channel="finelog" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('finelog')">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #fine-log
-                                </button>
-                                <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #arrest-logs
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -1398,7 +1291,7 @@
 
                         <!-- Traffic Code Table -->
                         <div class="penal-table-container">
-                            <div style="padding: 0.6rem 1rem; background: rgba(15,23,42,0.8); border-bottom: 1px solid var(--card-border); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: grid; grid-template-columns: 120px 1fr 110px 90px 65px 95px 40px; text-transform:uppercase; letter-spacing:0.5px;">
+                            <div class="traffic-table-header">
                                 <span>Code</span>
                                 <span>Law Description</span>
                                 <span>Fine</span>
@@ -1411,75 +1304,11 @@
                                 <!-- Populated dynamically via JS -->
                             </div>
                         </div>
-
-                        <!-- Live Citation / Booking Calculation Summary -->
-                        <div class="citation-summary-card" style="border-color: rgba(56,189,248,0.35);">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <span style="font-weight:700; font-size:0.95rem; color:var(--text-main); display:flex; align-items:center; gap:6px;">
-                                    <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.15rem;">calculate</span> Traffic Citation &amp; Charge Summary
-                                </span>
-                                <div style="display:flex; gap:0.5rem; align-items:center;">
-                                    <button class="btn btn-secondary btn-xs" onclick="window.app.transferTrafficToPenalEngine()" title="Copy selected traffic charges into the Penal Code engine" style="color:#38bdf8;">
-                                        <span class="material-symbols-outlined" style="font-size:0.85rem;">swap_horiz</span> Send to Penal Engine
-                                    </button>
-                                    <button class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedTrafficCharges()" style="color:#ef4444;">
-                                        <span class="material-symbols-outlined" style="font-size:0.85rem;">delete</span> Clear Selection
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="citation-stats-grid" style="grid-template-columns: repeat(5, 1fr);">
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Total Fine</div>
-                                    <div class="citation-stat-val money" id="traffic-stat-total-fine">$0</div>
-                                </div>
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Total Sentence</div>
-                                    <div class="citation-stat-val sentence" id="traffic-stat-total-sentence">-</div>
-                                </div>
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Wanted Stars</div>
-                                    <div class="citation-stat-val stars" id="traffic-stat-max-stars">-</div>
-                                </div>
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Towing Action</div>
-                                    <div class="citation-stat-val" id="traffic-stat-towing">-</div>
-                                </div>
-                                <div class="citation-stat-box">
-                                    <div class="citation-stat-title">Bail Status</div>
-                                    <div class="citation-stat-val" id="traffic-stat-bail">-</div>
-                                </div>
-                            </div>
-
-                            <!-- Formatted In-Game PDA Text Box -->
-                            <div class="input-group" style="margin-top:0.4rem; margin-bottom:0;">
-                                <label style="display:flex; justify-content:space-between;">
-                                    <span>In-Game PDA Citation Format (Flex 'J' Muscle)</span>
-                                    <span style="color:var(--text-muted); font-size:0.7rem;">Ready to paste directly into PDA wanted issue / traffic fine</span>
-                                </label>
-                                <div id="traffic-citation-pda-text" style="background:rgba(3,7,18,0.7); border:1px solid var(--card-border); padding:0.75rem; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.84rem; color:#38bdf8; min-height:44px; word-break:break-all;">
-                                    Select one or more traffic codes or regulations above to generate PDA citation charges...
-                                </div>
-                            </div>
-
-                            <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-                                <button class="btn btn-primary" id="btn-copy-traffic-pda" style="flex:1; min-width:140px; padding:0.65rem;" onclick="window.app.copyTrafficPdaCitation()">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">content_copy</span> Copy for PDA (J)
-                                </button>
-                                <button class="btn btn-info discord-jump-btn" data-discord-channel="finelog" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('finelog')">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #fine-log
-                                </button>
-                                <button class="btn btn-warning discord-jump-btn" data-discord-channel="towing" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('towing')">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">upload_file</span> #towing-logs
-                                </button>
-                                <button class="btn btn-success discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.65rem 0.9rem;" onclick="window.app.openDiscordChannel('arrestlogs')">
-                                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> #arrest-logs
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
+
+
 
             <!-- MODAL 4: ARRESTING PROCEDURE & 25-MIN TIMER -->
             <div class="modal-content" id="modal-arrest" style="max-width: 900px;">
@@ -1716,8 +1545,7 @@ Do you understand the rights I just read to you?"
                             <div class="input-group">
                                 <label>Duty / Job Assignment</label>
                                 <select id="settingJobType" style="width:100%; padding:0.6rem 0.8rem; background:rgba(3,7,18,0.7); border:1px solid var(--card-border); border-radius:10px; color:var(--text-main); font-size:0.88rem; outline:none;">
-                                    <option value="" disabled selected>Select Duty...</option>
-                                    <option value="Highway Patrol">Highway Patrol</option>
+                                    <option value="Highway Patrol" selected>Highway Patrol</option>
                                     <option value="City Patrol">City Patrol</option>
                                     <option value="Traffic Enforcement">Traffic Enforcement</option>
                                     <option value="Speed Radar Enforcement">Speed Radar Enforcement</option>
@@ -2128,6 +1956,136 @@ Do you understand the rights I just read to you?"
     <div id="tactical-toast" class="tactical-toast">
         <span class="material-symbols-outlined" style="font-size:1.15rem; color:#38bdf8;">info</span>
         <span id="toast-message">Notification</span>
+    </div>
+
+    <!-- Floating Draggable & Resizable Citation Summaries (Direct body children for true viewport coordinates) -->
+    <div class="citation-summary-card" id="penal-citation-summary">
+        <div class="citation-card-header">
+            <div class="citation-drag-handle" id="penal-summary-drag-handle" title="Drag anywhere on header to move">
+                <span class="material-symbols-outlined" style="font-size:1.1rem; opacity:0.65;">drag_indicator</span>
+                <span style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:flex; align-items:center; gap:5px;">
+                    <span class="material-symbols-outlined icon-gradient-gold" style="font-size:1.1rem;">calculate</span> Citation Summary
+                </span>
+            </div>
+            <div style="display:flex; gap:0.3rem; align-items:center;">
+                <button type="button" class="btn btn-secondary btn-xs" onclick="window.app.resetCitationSummaryPos('penal-citation-summary')" title="Reset position to default right dock" style="padding:0.25rem 0.45rem; color:var(--text-muted);">
+                    <span class="material-symbols-outlined" style="font-size:0.82rem;">restart_alt</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedCharges()" style="color:#ef4444; padding:0.25rem 0.5rem;">
+                    <span class="material-symbols-outlined" style="font-size:0.8rem;">delete</span> Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="citation-stats-grid">
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Total Fine</div>
+                <div class="citation-stat-val money" id="stat-total-fine">$0</div>
+            </div>
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Sentence</div>
+                <div class="citation-stat-val sentence" id="stat-total-sentence">-</div>
+            </div>
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Stars</div>
+                <div class="citation-stat-val stars" id="stat-max-stars">-</div>
+            </div>
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Bail Status</div>
+                <div class="citation-stat-val" id="stat-bail-status">-</div>
+            </div>
+        </div>
+
+        <!-- Formatted In-Game PDA Text Box (Separate Slots for Multi-Charge Paste) -->
+        <div class="input-group" style="margin-top:0.2rem; margin-bottom:0;">
+            <label style="display:flex; justify-content:space-between; font-size:0.68rem; align-items:center;">
+                <span>PDA Charge Slots (Flex 'J')</span>
+                <span style="color:var(--text-muted); font-size:0.65rem;" id="penal-pda-count-hint">Paste separately</span>
+            </label>
+            <div id="penal-pda-slots-container" class="pda-slots-container">
+                <div class="pda-empty-hint">Select charges to generate PDA format...</div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.2rem;">
+            <button class="btn btn-primary btn-sm" id="btn-copy-pda" style="flex:1; min-width:130px; padding:0.45rem 0.65rem; font-size:0.82rem;" onclick="window.app.copyPdaCitation()">
+                <span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy All (J)
+            </button>
+            <button class="btn btn-info btn-xs discord-jump-btn" data-discord-channel="finelog" style="padding:0.4rem 0.6rem;" onclick="window.app.openDiscordChannel('finelog')" title="#fine-log">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">open_in_new</span> #fine-log
+            </button>
+            <button class="btn btn-success btn-xs discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.4rem 0.6rem;" onclick="window.app.openDiscordChannel('arrestlogs')" title="#arrest-logs">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">open_in_new</span> #arrest-logs
+            </button>
+        </div>
+    </div>
+
+    <!-- Traffic Citation Summary -->
+    <div class="citation-summary-card" id="traffic-citation-summary" style="border-color: rgba(56,189,248,0.5);">
+        <div class="citation-card-header">
+            <div class="citation-drag-handle" id="traffic-summary-drag-handle" title="Drag anywhere on header to move">
+                <span class="material-symbols-outlined" style="font-size:1.1rem; opacity:0.65;">drag_indicator</span>
+                <span style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:flex; align-items:center; gap:5px;">
+                    <span class="material-symbols-outlined icon-gradient-cyan" style="font-size:1.1rem;">calculate</span> Traffic Summary
+                </span>
+            </div>
+            <div style="display:flex; gap:0.3rem; align-items:center;">
+                <button type="button" class="btn btn-secondary btn-xs" onclick="window.app.resetCitationSummaryPos('traffic-citation-summary')" title="Reset position to default right dock" style="padding:0.25rem 0.45rem; color:var(--text-muted);">
+                    <span class="material-symbols-outlined" style="font-size:0.82rem;">restart_alt</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-xs" onclick="window.app.transferTrafficToPenalEngine()" title="Send to Penal Engine" style="color:#38bdf8; padding:0.25rem 0.45rem;">
+                    <span class="material-symbols-outlined" style="font-size:0.8rem;">swap_horiz</span> To Penal
+                </button>
+                <button type="button" class="btn btn-secondary btn-xs" onclick="window.app.clearSelectedTrafficCharges()" style="color:#ef4444; padding:0.25rem 0.45rem;">
+                    <span class="material-symbols-outlined" style="font-size:0.8rem;">delete</span> Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="citation-stats-grid">
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Total Fine</div>
+                <div class="citation-stat-val money" id="traffic-stat-total-fine">$0</div>
+            </div>
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Sentence</div>
+                <div class="citation-stat-val sentence" id="traffic-stat-total-sentence">-</div>
+            </div>
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Stars</div>
+                <div class="citation-stat-val stars" id="traffic-stat-max-stars">-</div>
+            </div>
+            <div class="citation-stat-box">
+                <div class="citation-stat-title">Towing Action</div>
+                <div class="citation-stat-val" id="traffic-stat-towing">-</div>
+            </div>
+        </div>
+
+        <!-- Formatted In-Game PDA Text Box (Separate Slots for Multi-Charge Paste) -->
+        <div class="input-group" style="margin-top:0.2rem; margin-bottom:0;">
+            <label style="display:flex; justify-content:space-between; font-size:0.68rem; align-items:center;">
+                <span>PDA Citation Slots (Flex 'J')</span>
+                <span style="color:var(--text-muted); font-size:0.65rem;" id="traffic-pda-count-hint">Paste separately</span>
+            </label>
+            <div id="traffic-pda-slots-container" class="pda-slots-container">
+                <div class="pda-empty-hint">Select traffic charges to generate PDA format...</div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.2rem;">
+            <button class="btn btn-primary btn-sm" id="btn-copy-traffic-pda" style="flex:1; min-width:130px; padding:0.45rem 0.65rem; font-size:0.82rem;" onclick="window.app.copyTrafficPdaCitation()">
+                <span class="material-symbols-outlined" style="font-size:0.95rem;">content_copy</span> Copy All (J)
+            </button>
+            <button class="btn btn-info btn-xs discord-jump-btn" data-discord-channel="finelog" style="padding:0.4rem 0.6rem;" onclick="window.app.openDiscordChannel('finelog')" title="#fine-log">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">open_in_new</span> #fine-log
+            </button>
+            <button class="btn btn-warning btn-xs discord-jump-btn" data-discord-channel="towing" style="padding:0.4rem 0.6rem;" onclick="window.app.openDiscordChannel('towing')" title="#towing-logs">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">upload_file</span> #towing-logs
+            </button>
+            <button class="btn btn-success btn-xs discord-jump-btn" data-discord-channel="arrestlogs" style="padding:0.4rem 0.6rem;" onclick="window.app.openDiscordChannel('arrestlogs')" title="#arrest-logs">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">open_in_new</span> #arrest-logs
+            </button>
+        </div>
     </div>
 
     <!-- Scripts -->

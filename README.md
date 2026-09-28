@@ -118,20 +118,16 @@ The **SAHP Companion** is a dedicated, mission-critical Mobile Data Terminal (MD
 
 ### ✨ Key Features
 
-- **Smart Duty Automation**:
-  - One-click clipboard copy of standard SAHP radio status commands:
-    - **10-8 On Duty**: Copies `10-8 {Duty Name} {Current IC Time}`.
-    - **10-9 Off Duty**: Copies `10-9 {Duty Name} {Current IC Time}`.
-  - Automatic validation preventing on-duty activation without Badge ID and Division/Unit selection.
+- **Smart Duty & Live Clocks Automation**:
+  - Live In-Character (IC) time with automatic **Daylight Saving Time (DST)** compensation (`Europe/London` zone for BST/GMT Grand RP sync).
+  - Persistent one-click radio status generator (`10-8 On Duty` / `10-9 Off Duty`) with badge & division validation.
 - **2-in-1 Unified Legal & Traffic Code Engine**:
-  - Combined interactive database for **Penal Codes** and **Traffic Code**.
-  - Instant live fuzzy search by article, violation title, offense category, or keyword.
-  - Multi-select charge calculator dynamically computing:
-    - Total fine accumulation ($).
-    - Incarceration star rating (★).
-    - Driver's license suspension / confiscation flags.
-    - Mandatory vehicle impound requirements.
-  - One-click generation and clipboard copy of formatted arrest/citation Discord logs.
+  - Combined interactive database for **Penal Codes** and **Traffic Code** with instant fuzzy search.
+  - **Floating Draggable & Resizable Citation Drawer**: Smooth slide-in/slide-out drawer, draggable anywhere on screen with sub-pixel zero-jump precision, corner resizer, and 1-click dock reset.
+  - **Multi-Slot PDA Citation Generator (Flex 'J')**: Splits charges into separate input slots with individual click-to-copy buttons for fast pasting into in-game citation fields, plus bulk "Copy All (J)".
+  - **US Currency Formatter**: Standard `$X,XXX` formatted totals across fines, shift bonuses, and impound fees.
+  - Dynamic calculations for fine accumulations, star ratings (★), bail eligibility, license suspensions, and impound requirements.
+  - Direct jump buttons to departmental Discord channels (`#fine-log`, `#towing-logs`, `#arrest-logs`).
 - **Progressive Bodycam Verification SOP**:
   - Interactive multi-step verification protocol ensuring roleplay compliance and court-admissible bodycam footage.
   - Real-time progress bar tracking activation steps with reset and auto-save capabilities.

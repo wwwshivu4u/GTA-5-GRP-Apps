@@ -48,21 +48,22 @@ The **SAHP Companion** is a hardware-accelerated, high-performance MDT designed 
 
 The Top Navigation Bar gives troopers real-time situational awareness:
 
-### 1. Live Clocks
-- **In-Character (IC) Time**: 1:1 synchronization with the in-game server clock for accurate citation logging and arrest timestamps.
+### 1. Live Clocks & Automatic Daylight Saving Time (DST) Sync
+- **In-Character (IC) Time**: 1:1 synchronization with the Grand RP EN server clock (London timezone) with automatic seasonal **Daylight Saving Time (DST)** adjustment (BST UTC+1 / GMT UTC+0). Never suffers from 1-hour drift.
 - **Local Time**: Displays your real-world timezone for shift coordination.
 
 ### 2. Officer Identity & Profile
 - Clickable Officer Pill displaying your **Callsign**, **Badge ID**, and **Rank**.
 - Clicking the pill opens **Settings & Profile Config** for rapid updating.
 
-### 3. One-Click Smart Duty Toggle
-- Replaced cumbersome text buttons with an instantaneous **Tactical Duty Icon Button**:
+### 3. Persistent One-Click Smart Duty Toggle
+- Instantaneous **Tactical Duty Icon Button** with persistent local state:
   - **On-Duty Check**: Verifies that your **Badge ID** and **Job/Department Type** (e.g., Patrol, Speed Enforcement, High Command) are configured before going on duty.
   - **Clipboard Automation**: Automatically formats and copies the official SAHP Discord duty log format to your clipboard:
     - **On Duty**: `10-8 {Job Type} {Badge ID} {Current IC Time}`
     - **Off Duty**: `10-9 {Job Type} {Badge ID} {Current IC Time}`
   - Visual pulse indicator shifts between Glowing Green (`ON DUTY`) and Stealth Grey (`OFF DUTY`).
+  - State persists across browser sessions and reloads.
 
 ---
 
@@ -105,19 +106,29 @@ Standard Operating Procedures (SOP) with pre-formatted `/me`, `/do`, `/try`, and
 Consolidated 2-in-1 legal calculator combining the full **San Andreas Penal Code** and **Traffic Enforcement Code**:
 - **Tab Switcher**: Seamlessly toggle between **Penal Code** and **Traffic Violations** without losing your citation state.
 - **135+ Penal Codes Indexed**: Complete database spanning Crimes Against Persons, Property, Society, State, and Weapons Violations.
-- **Automated Calculations**:
+- **Automated Legal Calculations**:
   - Select multiple infractions with checkboxes.
-  - Automatically calculates cumulative **Fines ($)** and **Prison Sentences (Months)**.
+  - Automatically calculates cumulative **Fines** formatted in US currency (`$X,XXX`) and **Prison Sentences (Months)**.
   - Identifies **Felony Classifications** (Class A, B, C, D) and **Star Levels** (⭐).
   - Displays **Bail Eligibility** / No-Bail conditions.
 - **Traffic Code Engine**:
   - Live search across moving violations, reckless driving, illegal parking, and license suspensions.
-  - Displays **Demerit Points**, **Fines**, and **Impound Fees**.
-  - Includes **"Transfer to Penal Engine"** feature to combine traffic citations with criminal charges into a single grand total.
-- **1-Click PDA Citation Formatter**: Generates ready-to-paste text formatted for the in-game Grand RP PDA citation entry field:
-  ```text
-  P.C. 1.2.1 Armed Robbery | P.C. 3.1.2 Evading Police | Fine: $85,000 | Time: 45m
-  ```
+  - Displays **Demerit Points**, **Fines ($)**, and **Impound Fees ($)** in standard US format.
+  - Includes **"To Penal"** transfer feature to combine traffic citations with criminal charges into a single grand total.
+- **Floating Draggable & Resizable Citation Drawer**:
+  - **Dynamic Slide-In**: Slides in smoothly from the right when charges are selected; slides out of the viewport when charges are cleared.
+  - **Free-Floating Draggable**: Drag the summary box anywhere on the screen by clicking and dragging anywhere on its header. Engineered with sub-pixel delta math for 0px cursor jump.
+  - **Resizable**: Drag the bottom-right textured corner grip (`resize: both`) to expand or contract the box.
+  - **1-Click Dock Reset**: Click the `restart_alt` icon to snap the summary box back to its default right-docked position.
+- **Multi-Slot In-Game PDA Citation Formatter (Flex 'J')**:
+  - Rather than forcing one huge combined string, selected charges are rendered into individual **PDA Slot Input Boxes** (`Slot #1`, `Slot #2`, `Slot #3`, etc.).
+  - Each slot features a dedicated **Copy** button to quickly paste each charge one-by-one into Grand RP's PDA citation interface.
+  - A **Copy All (J)** button remains available for full bulk string copying:
+    ```text
+    P.C. 1.2.1 Armed Robbery | P.C. 3.1.2 Evading Police | Fine: $85,000 | Time: 45m
+    ```
+- **US Standard Currency Formatter**:
+  - All fines, shift bonuses, impound fees, and calculations are rendered in clean US currency formatting (`$15,000`, `$45,000`).
 
 ### 5. 📁 Department Utilities ("More" Modal)
 Secondary tactical utilities bundled into a clean drawer modal:
